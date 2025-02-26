@@ -4,8 +4,8 @@
  * @param {CbServer.Resp} resp
  */
 
-function {{component_prefix}}_update(req, resp) {
+function rtsp_uninstall(req, resp) {
   const params = req.params;
-  //component update behavior here. Allow the user to update an instance of the component
+  //component uninstall behavior here, undo any steps done in the install service
   resp.success('Success');
 }

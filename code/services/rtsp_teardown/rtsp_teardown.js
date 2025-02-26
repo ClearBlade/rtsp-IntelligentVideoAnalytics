@@ -4,9 +4,8 @@
  * @param {CbServer.Resp} resp
  */
 
-function {{component_prefix}}_install(req, resp) {
+function rtsp_teardown(req, resp) {
   const params = req.params;
-  const mfe_settings = params.mfe_settings;
-  //component install behavior here. Initialize an instance of the component for use
+  //component teardown behavior here. Undo any setup done in the setup service
   resp.success('Success');
 }

@@ -16,9 +16,13 @@ module.exports = (webpackConfigEnv, argv) => {
       path: path.resolve(__dirname, "dist"),
     },
     entry: {
-      rtsp_IntelligentVideoAnalytics: path.resolve(
+      iva_setup: path.resolve(
         __dirname,
-        "mfe/rtsp_IntelligentVideoAnalytics/index.tsx"
+        "mfe/setup/index.tsx"
+      ),
+      iva_details: path.resolve(
+        __dirname,
+        "mfe/details/index.tsx"
       ),
     },
     externals: [

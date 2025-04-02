@@ -1,11 +1,9 @@
 import { useMutation } from 'react-query';
 import { Device } from "../components/EditableDeviceForm";
 import { getErrorMessage } from '../helpers/getErrorMessage';
-
+import { getAuthInfo } from '../utils/authInfo';
+import { getPlatformInfo } from '../utils/platformInfo';
 interface StreamData {
-  platformURL: string;
-  systemKey: string;
-  token: string;
   edge: string;
   credentials: Device
 }
@@ -19,8 +17,8 @@ const getRTSPUrl = (credentials: Device) => {
   return rtspUrl || `rtsp://${username}:${password}@${ip}:${port}/${streamingChannel}`;
 }
 
-export const addLatestDeviceFrameToHistory = async (deviceId: string, image: string, platformURL: string, systemKey: string, token: string) => {
-  if (!systemKey || !platformURL) {
+export const addLatestDeviceFrameToHistory = async (deviceId: string, image: string, url: string, systemKey: string, token: string) => {
+  if (!systemKey || !url) {
     throw new Error('systemKey or platform info or edgeId missing.');
   }
 
@@ -29,7 +27,7 @@ export const addLatestDeviceFrameToHistory = async (deviceId: string, image: str
     'Content-Type': 'application/json',
   }
 
-  const response = await fetch(`${platformURL}/api/v/4/collection/${systemKey}/device_feeds/upsert?conflictColumn=device_id`, {
+  const response = await fetch(`${url}/api/v/4/collection/${systemKey}/device_feeds/upsert?conflictColumn=device_id`, {
     method: 'PUT',
     headers: headers,
     body: JSON.stringify({
@@ -48,9 +46,13 @@ export const addLatestDeviceFrameToHistory = async (deviceId: string, image: str
 
 export const useCreateStream = (onSuccess: (data: StreamResponse) => void) => {
   return useMutation<StreamResponse, Error, StreamData>(
-    async ({credentials, edge, platformURL, systemKey, token}) => {
+    async ({credentials, edge}) => {
+
+      const { systemKey, userToken } = getAuthInfo();
+      const { url } = getPlatformInfo();
+
       console.log(`initiate stream for ${edge} with ${JSON.stringify(credentials)}`);
-      if (!systemKey || !edge || !platformURL) {
+      if (!systemKey || !edge || !url) {
         throw new Error('systemKey or platform info or edgeId missing.');
       }
 
@@ -62,7 +64,7 @@ export const useCreateStream = (onSuccess: (data: StreamResponse) => void) => {
       }
 
       try {
-        const startStreamResponse = await fetch(`${platformURL}/api/v/4/webhook/execute/${systemKey}/manageStreams`, {
+        const startStreamResponse = await fetch(`${url}/api/v/4/webhook/execute/${systemKey}/manageStreams`, {
           method: 'POST',
           headers: baseHeaders,
           body: JSON.stringify({
@@ -84,7 +86,7 @@ export const useCreateStream = (onSuccess: (data: StreamResponse) => void) => {
         const image = startStreamResponseData.results.image;
 
         // TODO - Add device details to file/collection
-        await addLatestDeviceFrameToHistory(credentials.deviceId, image, platformURL, systemKey, token);
+        await addLatestDeviceFrameToHistory(credentials.deviceId, image, url, systemKey, userToken);
         
         return { image: image };
       } catch (error) {

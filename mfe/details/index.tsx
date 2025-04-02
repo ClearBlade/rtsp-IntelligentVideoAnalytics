@@ -1,5 +1,5 @@
 import { getBasePath } from "@clearblade/ia-mfe-core";
-import { AppProviders } from "@clearblade/ia-mfe-react";
+import { AppProviders, useAuth } from "@clearblade/ia-mfe-react";
 import { Subscribe } from "@react-rxjs/core";
 import React from "react";
 import ReactDOM from "react-dom";

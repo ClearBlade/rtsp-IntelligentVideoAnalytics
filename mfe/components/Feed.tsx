@@ -16,7 +16,7 @@ import {
 import React from "react";
 import FullscreenIcon from "@material-ui/icons/Fullscreen";
 import RefreshIcon from "@material-ui/icons/Refresh";
-import useIsMobileOrTab from "../api/useIsMobileOrTab";
+import useIsMobileOrTab from "../hooks/useIsMobileOrTab";
 import CloseIcon from "@material-ui/icons/Close";
 import { formatDistanceToNow } from "date-fns";
 import LastRefreshTime from "./LastRefreshTime";

@@ -1,16 +1,20 @@
 import { useQuery } from 'react-query';
 import { Device } from '../components/EditableDeviceForm';
 import { addLatestDeviceFrameToHistory } from './useCreateStream';
+import { getAuthInfo } from '../utils/authInfo';
+import { getPlatformInfo } from '../utils/platformInfo';
 
-const fetchLatestFeed = async (deviceId: string, edgeId: string, platformURL: string, systemKey: string | undefined, token: string) => {
-  
-  if (!platformURL || !systemKey) {
+const fetchLatestFeed = async (deviceId: string, edgeId: string) => {
+  const { systemKey, userToken } = getAuthInfo();
+  const { url } = getPlatformInfo();
+
+  if (!url || !systemKey) {
     throw new Error('Platform URL or system key is missing');
   }
 
-  console.log(`fetching latest feed for ${deviceId} on ${platformURL} with system key ${systemKey}`);
+  console.log(`fetching latest feed for ${deviceId} on ${url} with system key ${systemKey}`);
 
-  const response = await fetch(`${platformURL}/api/v/4/webhook/execute/${systemKey}/manageStreams`, {
+  const response = await fetch(`${url}/api/v/4/webhook/execute/${systemKey}/manageStreams`, {
     method: 'POST',
     headers: {
       'clearblade-edge': edgeId,
@@ -33,13 +37,13 @@ const fetchLatestFeed = async (deviceId: string, edgeId: string, platformURL: st
 
   const responseData = await response.json();
   
-  await addLatestDeviceFrameToHistory(deviceId, responseData.results.image, platformURL, systemKey, token);
+  await addLatestDeviceFrameToHistory(deviceId, responseData.results.image, url, systemKey, userToken);
 
   return { image: responseData.results.image };
 };
 
-const useFetchLatestFeed = (deviceId: string, edgeId: string, platformURL: string, systemKey: string | undefined, token: string) => {
-  return useQuery('latestFeed', () => fetchLatestFeed(deviceId, edgeId, platformURL, systemKey, token), { enabled: false });
+const useFetchLatestFeed = (deviceId: string, edgeId: string) => {
+  return useQuery('latestFeed', () => fetchLatestFeed(deviceId, edgeId), { enabled: false });
 };
 
 export default useFetchLatestFeed;

@@ -40,7 +40,6 @@ function ConfigureBucketSet({
   device: Device | null;
   setDevice: (device: Device) => void;
 }) {
-  const { platformURL, systemKey, userToken } = useConfig();
   const classes = useStyles();
   const { setFieldValue } = useFormikContext<Device>();
 
@@ -50,7 +49,7 @@ function ConfigureBucketSet({
     isError,
     error,
     refetch,
-  } = useFetchBucketSets(platformURL, systemKey, userToken);
+  } = useFetchBucketSets();
 
   const getBucketSetName = (path: { id: string; path: string } | undefined) => {
     if (!path) return "";

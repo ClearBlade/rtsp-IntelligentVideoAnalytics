@@ -8,7 +8,7 @@ const fetchDeviceTasks = async (deviceId: string) => {
         {
           uuid: "8e2da6ae-d544-4c89-8abf-332c786b4932",
           name: "Count number of people",
-          type: "object_detection",
+          id: "object_detection",
           isOpen: false,
           settings: {
             "objects_to_detect": {

@@ -295,8 +295,6 @@ function EditableDeviceForm({
   refresh,
   isRefreshing,
 }: EditableDeviceFormProps) {
-  const { systemKey, userToken, platformURL } = useConfig();
-
   const classes = useStyles();
   const [activeForm, setActiveForm] = useState<"CREDENTIALS" | "RTSP">(
     "CREDENTIALS"
@@ -406,13 +404,7 @@ function EditableDeviceForm({
           password: "",
         };
         setDevice(rtspValues);
-        initiateStream({
-          platformURL: platformURL,
-          systemKey: systemKey,
-          edge: edgeId,
-          credentials: rtspValues,
-          token: userToken,
-        });
+        initiateStream({ edge: edgeId, credentials: rtspValues });
       } else {
         const rtspValues = {
           ...values,
@@ -420,25 +412,11 @@ function EditableDeviceForm({
         };
         if (rtspValues) {
           setDevice(rtspValues);
-          initiateStream({
-            platformURL: platformURL,
-            systemKey: systemKey,
-            edge: edgeId,
-            credentials: rtspValues,
-            token: userToken,
-          });
+          initiateStream({ edge: edgeId, credentials: rtspValues });
         }
       }
     },
-    [
-      activeForm,
-      setDevice,
-      initiateStream,
-      platformURL,
-      systemKey,
-      edgeId,
-      userToken,
-    ]
+    [activeForm, setDevice, initiateStream, edgeId]
   );
 
   useEffect(() => {

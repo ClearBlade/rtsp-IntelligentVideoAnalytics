@@ -19,12 +19,10 @@ import Tasks, { Task } from "../components/Tasks";
 import useFetchDeviceTasks from "../api/useFetchDeviceTasks";
 import useFetchDeviceDetails from "../api/useFetchDeviceDetails";
 import useFetchDeviceFeed from "../api/useFetchDeviceFeed";
-import { useQueries } from "react-query";
 import TaskTable from "../components/TaskTable";
 import useFetchLatestFeed from "../api/useFetchLatestFeed";
-import useIsMobileOrTab from "../api/useIsMobileOrTab";
-import { usePlatformInfo } from "@clearblade/ia-mfe-react";
-import { useConfig } from "../context/ConfigContext";
+import useIsMobileOrTab from "../hooks/useIsMobileOrTab";
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
   const deviceType = useIsMobileOrTab();
@@ -62,13 +60,6 @@ const IVADetails = (props: {
   device: Device;
   tasks: Task[];
 }) => {
-  const { platformInfo } = usePlatformInfo();
-  const { systemKey, userToken } = useConfig();
-
-  if (!platformInfo || !platformInfo.url) {
-    return null;
-  }
-
   const deviceType = useIsMobileOrTab();
   const [value, setValue] = useState(0);
   const [image, setImage] = useState<{
@@ -100,13 +91,7 @@ const IVADetails = (props: {
     isLoading: isLoadingLatestFeed,
     isFetching: isFetchingLatestFeed,
     refetch: refetchLatestFeed,
-  } = useFetchLatestFeed(
-    device?.deviceId || "",
-    "ivaEdge1",
-    platformInfo.url,
-    systemKey,
-    userToken
-  ); // this is the refetching the latest feed
+  } = useFetchLatestFeed(device?.deviceId || "", "ivaEdge1"); // this is the refetching the latest feed
 
   const refresh = async () => {
     if (device) {

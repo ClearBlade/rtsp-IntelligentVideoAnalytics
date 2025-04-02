@@ -14,11 +14,10 @@ import {
 import EditableDeviceForm, { Device } from "../components/EditableDeviceForm";
 import Tasks, { Task } from "../components/Tasks";
 import { MultiStepModal } from "../components/MultiStepModal";
-import useIsMobileOrTab from "../api/useIsMobileOrTab";
+import useIsMobileOrTab from "../hooks/useIsMobileOrTab";
 import { MultiStepModalStep } from "../components/MultiStepModal/types";
 import useFetchLatestFeed from "../api/useFetchLatestFeed";
 import { usePlatformInfo } from "@clearblade/ia-mfe-react";
-import { ConfigProvider } from "../context/ConfigContext";
 import { useUpdateTasks } from "../api/useUpdateTasks";
 import { Alert } from "@material-ui/lab";
 
@@ -29,14 +28,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface IVASetupProps {
-  systemKey: string;
-  userToken: string;
   edgeId: string;
   assets: { id: string; label: string; attributes: Record<string, string> }[];
 }
 
 export default function IVASetup(props: IVASetupProps) {
-  const { edgeId, assets, systemKey, userToken } = props;
+  const { edgeId, assets } = props;
 
   const { platformInfo } = usePlatformInfo();
   if (!platformInfo || !platformInfo.url) {
@@ -77,10 +74,7 @@ export default function IVASetup(props: IVASetupProps) {
 
   const { isLoading, isFetching, refetch } = useFetchLatestFeed(
     device?.deviceId || "",
-    edgeId || "ivaEdge1", //TODO: Remove "ivaEdge1"
-    platformInfo.url,
-    systemKey,
-    userToken
+    edgeId || "ivaEdge1" //TODO: Remove "ivaEdge1"
   );
 
   const {
@@ -251,11 +245,7 @@ export default function IVASetup(props: IVASetupProps) {
   ];
 
   return (
-    <ConfigProvider
-      systemKey={systemKey}
-      userToken={userToken}
-      platformURL={platformInfo.url}
-    >
+    <>
       {deviceType === "desktop" ? (
         <Dialog
           scroll="paper"
@@ -316,9 +306,6 @@ export default function IVASetup(props: IVASetupProps) {
                     updateTasks({
                       device,
                       tasks,
-                      platformURL: platformInfo.url,
-                      systemKey,
-                      token: userToken,
                       edge: edgeId || "ivaEdge1", //TODO: Remove "ivaEdge1",
                     });
                   }
@@ -352,6 +339,6 @@ export default function IVASetup(props: IVASetupProps) {
           disableNextSteps={image === null}
         />
       )}
-    </ConfigProvider>
+    </>
   );
 }

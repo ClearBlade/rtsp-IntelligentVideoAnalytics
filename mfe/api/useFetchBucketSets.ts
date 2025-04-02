@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query';
 import { Task } from '../components/Tasks';
-
+import { getPlatformInfo } from '../utils/platformInfo';
+import { getAuthInfo } from '../utils/authInfo';
 type BucketSet = {
   edge_config: {
     root: string;
@@ -21,13 +22,15 @@ type BucketSet = {
 };
 
 
-const fetchBucketSets = async (platformURL: string, systemKey: string, token: string): Promise<BucketSet[]> => {
+const fetchBucketSets = async (): Promise<BucketSet[]> => {
+  const { url } = getPlatformInfo();
+  const { systemKey, userToken } = getAuthInfo();
   try {
-    const response = await fetch(`${platformURL}/api/v/4/bucket_sets/${systemKey}`, {
+    const response = await fetch(`${url}/api/v/4/bucket_sets/${systemKey}`, {
       headers: {
-        'Clearblade-DevToken': token
-    }
-  });
+        'Clearblade-DevToken': userToken
+      }
+    });
 
   if (!response.ok) {
     const text = await response.text();
@@ -40,8 +43,8 @@ const fetchBucketSets = async (platformURL: string, systemKey: string, token: st
   }
 };
 
-const useFetchBucketSets = (platformURL: string, systemKey: string, token: string) => {
-  return useQuery<BucketSet[], Error>('bucketSets', () => fetchBucketSets(platformURL, systemKey, token));
+const useFetchBucketSets = () => {
+  return useQuery<BucketSet[], Error>('bucketSets', () => fetchBucketSets());
 };
 
 export default useFetchBucketSets;

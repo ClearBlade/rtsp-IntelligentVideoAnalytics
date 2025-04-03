@@ -404,7 +404,7 @@ function EditableDeviceForm({
           password: "",
         };
         setDevice(rtspValues);
-        initiateStream({ edge: edgeId, credentials: rtspValues });
+        initiateStream({ edge: edgeId, device: rtspValues });
       } else {
         const rtspValues = {
           ...values,
@@ -412,7 +412,7 @@ function EditableDeviceForm({
         };
         if (rtspValues) {
           setDevice(rtspValues);
-          initiateStream({ edge: edgeId, credentials: rtspValues });
+          initiateStream({ edge: edgeId, device: rtspValues });
         }
       }
     },

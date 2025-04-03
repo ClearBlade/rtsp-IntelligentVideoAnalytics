@@ -17,7 +17,6 @@ import { MultiStepModal } from "../components/MultiStepModal";
 import useIsMobileOrTab from "../hooks/useIsMobileOrTab";
 import { MultiStepModalStep } from "../components/MultiStepModal/types";
 import useFetchLatestFeed from "../api/useFetchLatestFeed";
-import { usePlatformInfo } from "@clearblade/ia-mfe-react";
 import { useUpdateTasks } from "../api/useUpdateTasks";
 import { Alert } from "@material-ui/lab";
 
@@ -34,11 +33,6 @@ interface IVASetupProps {
 
 export default function IVASetup(props: IVASetupProps) {
   const { edgeId, assets } = props;
-
-  const { platformInfo } = usePlatformInfo();
-  if (!platformInfo || !platformInfo.url) {
-    return null;
-  }
 
   const classes = useStyles();
 

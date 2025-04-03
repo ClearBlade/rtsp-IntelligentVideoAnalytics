@@ -10,11 +10,45 @@ interface UpdateTasksData {
   edge: string
 }
 
+const addTasksToDeviceConfig = async (device: Device, tasks: Task[], systemKey: string, url: string, userToken: string) => {
+  const response = await fetch(`${url}/api/v/1/collection/${systemKey}/device_configs`, {
+    method: 'PUT',
+    headers: {
+      'Clearblade-UserToken': userToken,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      '$set': {
+        'tasks': tasks,
+        'root_path': device.rootPath
+      },
+      'query': {
+        "FILTERS": [
+          [
+            {
+              "EQ": [
+                {
+                  "device_id": device.deviceId
+                }
+              ]
+            }
+          ]
+        ]
+      }
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to add device details to collection: ${response.statusText}`);
+  }
+
+  return response.json();
+}
 
 export const useUpdateTasks = (onSuccess: (data: any) => void, onError: (error: Error) => void) => {
   return useMutation<any, Error, UpdateTasksData>(
     async ({device, tasks, edge}) => {
-      const { systemKey } = getAuthInfo();
+      const { systemKey, userToken } = getAuthInfo();
       const { url } = getPlatformInfo();
       console.log(`update tasks for ${device.deviceId}`);
       try {
@@ -26,7 +60,7 @@ export const useUpdateTasks = (onSuccess: (data: any) => void, onError: (error: 
           }
         }));
 
-        // TODO: Add tasks to device config in files/collections
+        await addTasksToDeviceConfig(device, updatedTasks, systemKey, url, userToken);
 
         const updateTasksResponse = await fetch(`${url}/api/v/4/webhook/execute/${systemKey}/manageStreams`, {
           method: 'POST',

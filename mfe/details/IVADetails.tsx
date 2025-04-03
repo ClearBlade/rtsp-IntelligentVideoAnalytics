@@ -74,19 +74,19 @@ const IVADetails = (props: {
     isLoading: isDeviceLoading,
     isError: isDeviceError,
     error: deviceError,
-  } = useFetchDeviceDetails("test");
-  const {
-    data: deviceTasks,
-    isLoading: isTasksLoading,
-    isError: isTasksError,
-    error: tasksError,
-  } = useFetchDeviceTasks("test");
+  } = useFetchDeviceDetails("hik101");
+  // const {
+  //   data: deviceTasks,
+  //   isLoading: isTasksLoading,
+  //   isError: isTasksError,
+  //   error: tasksError,
+  // } = useFetchDeviceTasks("test");
   const {
     data: deviceFeed, // TODO: Add timestamp here
     isLoading: isFeedLoading,
     isError: isFeedError,
     error: feedError,
-  } = useFetchDeviceFeed("test"); // this is the previously saved feed
+  } = useFetchDeviceFeed("hik101"); // this is the previously saved feed
   const {
     isLoading: isLoadingLatestFeed,
     isFetching: isFetchingLatestFeed,
@@ -105,18 +105,18 @@ const IVADetails = (props: {
     }
   };
 
-  const isLoading = isDeviceLoading || isTasksLoading || isFeedLoading;
-  const isError = isDeviceError || isTasksError || isFeedError;
+  const isLoading = isDeviceLoading || isFeedLoading;
+  const isError = isDeviceError || isFeedError;
 
   useEffect(() => {
     if (deviceDetails) setDevice(deviceDetails);
-    if (deviceTasks) setTasks(deviceTasks);
+    if (deviceDetails?.tasks) setTasks(deviceDetails.tasks);
     if (deviceFeed)
       setImage({
         base64: deviceFeed.image,
-        timestamp: Date.now(),
+        timestamp: new Date(deviceFeed.timestamp).getTime(),
       });
-  }, [deviceDetails, deviceTasks, deviceFeed]);
+  }, [deviceDetails, deviceFeed]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -149,7 +149,7 @@ const IVADetails = (props: {
   if (isError) {
     return (
       <div>{`Error occurred while fetching data: ${
-        deviceError || tasksError || feedError
+        deviceError || feedError
       }`}</div>
     );
   }

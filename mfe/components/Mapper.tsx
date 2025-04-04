@@ -310,14 +310,3 @@ export default function Mapper({
     </>
   );
 }
-
-// {rows.map((row, idx) => {
-//   return (
-//     <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
-//       {columns.map((column) => {
-//         const value = row[column.id];
-//         return <TableCell key={column.id}>{value}</TableCell>;
-//       })}
-//     </TableRow>
-//   );
-// })}

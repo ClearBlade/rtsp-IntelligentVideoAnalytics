@@ -32,7 +32,7 @@ const fetchDeviceDetails = async (deviceId: string): Promise<Device & { tasks: T
 
   const queryString = `?query=${encodeURIComponent(JSON.stringify({ device_id: deviceId }))}`;
 
-  const response = await fetch(`${url}/api/v/1/collection/${systemKey}/device_configs${queryString}`, {
+  const response = await fetch(`${url}/api/v/1/collection/${systemKey}/rtsp_configs${queryString}`, {
     method: 'GET',
     headers: {
       'Clearblade-UserToken': userToken,

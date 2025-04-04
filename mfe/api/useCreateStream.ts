@@ -27,7 +27,7 @@ export const addLatestDeviceFrameToHistory = async (deviceId: string, image: str
     'Content-Type': 'application/json',
   }
 
-  const response = await fetch(`${url}/api/v/4/collection/${systemKey}/device_feeds/upsert?conflictColumn=device_id`, {
+  const response = await fetch(`${url}/api/v/4/collection/${systemKey}/rtsp_feeds/upsert?conflictColumn=device_id`, {
     method: 'PUT',
     headers: headers,
     body: JSON.stringify({
@@ -45,7 +45,7 @@ export const addLatestDeviceFrameToHistory = async (deviceId: string, image: str
 }
 
 const addDeviceDetailsToCollection = async (device: Device, edge: string, url: string, systemKey: string, userToken: string) => {
-  const response = await fetch(`${url}/api/v/4/collection/${systemKey}/device_configs/upsert?conflictColumn=device_id`, {
+  const response = await fetch(`${url}/api/v/4/collection/${systemKey}/rtsp_configs/upsert?conflictColumn=device_id`, {
     method: 'PUT',
     headers: {
       'Clearblade-UserToken': userToken,

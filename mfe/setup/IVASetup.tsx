@@ -294,7 +294,6 @@ export default function IVASetup(props: IVASetupProps) {
                 if (tabIndex === 0) {
                   setTabIndex((prev) => prev + 1);
                 } else {
-                  // TODO save and add device rootpath to tasks
                   console.log("saving: ", device, tasks, edgeId);
                   if (device) {
                     updateTasks({

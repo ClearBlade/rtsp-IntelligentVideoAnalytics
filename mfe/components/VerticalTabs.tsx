@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
     top: 0,
     left: 0,
     height: "100%",
-    backgroundColor: theme.palette.background.paper,
+    // backgroundColor: theme.palette.background.paper,
     overflowY: "auto",
   },
   indicator: {
@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
     textTransform: "none",
     height: "100%",
     "&.Mui-selected": {
-      backgroundColor: "lightgrey",
+      backgroundColor: theme.palette.action.selected,
     },
     "& .MuiTab-wrapper": {
       paddingLeft: theme.spacing(2),

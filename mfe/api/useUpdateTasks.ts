@@ -11,7 +11,7 @@ interface UpdateTasksData {
 }
 
 const addTasksToDeviceConfig = async (device: Device, tasks: Task[], systemKey: string, url: string, userToken: string) => {
-  const response = await fetch(`${url}/api/v/1/collection/${systemKey}/device_configs`, {
+  const response = await fetch(`${url}/api/v/1/collection/${systemKey}/rtsp_configs`, {
     method: 'PUT',
     headers: {
       'Clearblade-UserToken': userToken,

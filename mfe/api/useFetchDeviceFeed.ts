@@ -13,7 +13,7 @@ const fetchDeviceFeed = async (deviceId: string): Promise<{image: string, timest
   const { systemKey, userToken } = getAuthInfo();
   
   const queryString = `?query=${encodeURIComponent(JSON.stringify({ device_id: deviceId }))}`;
-  const response = await fetch(`${url}/api/v/1/collection/${systemKey}/device_feeds${queryString}`, {
+  const response = await fetch(`${url}/api/v/1/collection/${systemKey}/rtsp_feeds${queryString}`, {
     headers: {
       'Clearblade-UserToken': userToken,
     },

@@ -13,7 +13,7 @@ interface StreamResponse {
 }
 
 const updateDeviceDetails = async (deviceId: string, url: string, systemKey: string, userToken: string) => {
-  const response = await fetch(`${url}/api/v/4/collection/${systemKey}/device_configs`, {
+  const response = await fetch(`${url}/api/v/4/collection/${systemKey}/rtsp_configs`, {
     method: 'PUT',
     headers: {
       'Clearblade-UserToken': userToken,

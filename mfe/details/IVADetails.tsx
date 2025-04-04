@@ -82,7 +82,7 @@ const IVADetails = (props: {
   //   error: tasksError,
   // } = useFetchDeviceTasks("test");
   const {
-    data: deviceFeed, // TODO: Add timestamp here
+    data: deviceFeed,
     isLoading: isFeedLoading,
     isError: isFeedError,
     error: feedError,

@@ -1,0 +1,40 @@
+{
+    "indexes": {
+        "Total": 0,
+        "Data": []
+    },
+    "items": [],
+    "name": "rtsp_targets",
+    "schema": [
+        {
+            "ColumnName": "item_id",
+            "ColumnType": "uuid",
+            "PK": true
+        },
+        {
+            "ColumnName": "target_id",
+            "ColumnType": "string",
+            "PK": false
+        },
+        {
+            "ColumnName": "device_id",
+            "ColumnType": "string",
+            "PK": false
+        },
+        {
+            "ColumnName": "task_uuid",
+            "ColumnType": "string",
+            "PK": false
+        },
+        {
+            "ColumnName": "task_type",
+            "ColumnType": "string",
+            "PK": false
+        },
+        {
+            "ColumnName": "mappings",
+            "ColumnType": "jsonb",
+            "PK": false
+        }
+    ]
+}

@@ -1,0 +1,65 @@
+{
+    "indexes": {
+        "Total": 1,
+        "Data": [
+            {
+                "name": "device_id",
+                "type": "Unique Index"
+            }
+        ]
+    },
+    "items": [],
+    "name": "rtsp_configs",
+    "schema": [
+        {
+            "ColumnName": "item_id",
+            "ColumnType": "uuid",
+            "PK": true
+        },
+        {
+            "ColumnName": "device_id",
+            "ColumnType": "string",
+            "PK": false
+        },
+        {
+            "ColumnName": "device_name",
+            "ColumnType": "string",
+            "PK": false
+        },
+        {
+            "ColumnName": "credentials",
+            "ColumnType": "jsonb",
+            "PK": false
+        },
+        {
+            "ColumnName": "root_path",
+            "ColumnType": "jsonb",
+            "PK": false
+        },
+        {
+            "ColumnName": "tasks",
+            "ColumnType": "jsonb",
+            "PK": false
+        },
+        {
+            "ColumnName": "last_updated",
+            "ColumnType": "timestamp",
+            "PK": false
+        },
+        {
+            "ColumnName": "last_active_time",
+            "ColumnType": "timestamp",
+            "PK": false
+        },
+        {
+            "ColumnName": "is_active",
+            "ColumnType": "bool",
+            "PK": false
+        },
+        {
+            "ColumnName": "edge",
+            "ColumnType": "string",
+            "PK": false
+        }
+    ]
+}

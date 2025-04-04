@@ -1,0 +1,35 @@
+{
+    "indexes": {
+        "Total": 1,
+        "Data": [
+            {
+                "name": "device_id",
+                "type": "Unique Index"
+            }
+        ]
+    },
+    "items": [],
+    "name": "rtsp_feeds",
+    "schema": [
+        {
+            "ColumnName": "item_id",
+            "ColumnType": "uuid",
+            "PK": true
+        },
+        {
+            "ColumnName": "last_updated",
+            "ColumnType": "timestamp",
+            "PK": false
+        },
+        {
+            "ColumnName": "device_id",
+            "ColumnType": "string",
+            "PK": false
+        },
+        {
+            "ColumnName": "frame_b64",
+            "ColumnType": "string",
+            "PK": false
+        }
+    ]
+}

@@ -13,6 +13,7 @@ import CustomTextField from "../helpers/CustomTextField";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import useFetchEdges from "../api/useFetchEdges";
 import { useDeployToEdge } from "../api/useDeployToEdge";
+import useIsMobileOrTab from "../hooks/useIsMobileOrTab";
 
 export interface Edge {
   name: string;
@@ -51,6 +52,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 function EdgeSetup({ edge, setEdge }: EdgeSetupProps) {
+  const deviceType = useIsMobileOrTab();
   const classes = useStyles();
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(edge);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +88,7 @@ function EdgeSetup({ edge, setEdge }: EdgeSetupProps) {
     );
   }
   return (
-    <Box width={"80%"}>
+    <Box width={deviceType === "mobile" ? "100%" : "80%"}>
       <Typography
         className={classes.typographyText}
         variant="h5"

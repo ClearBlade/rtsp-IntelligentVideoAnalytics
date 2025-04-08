@@ -1,0 +1,22 @@
+{
+    "app_tour": null,
+    "areas": null,
+    "assets": null,
+    "cb_service_account": true,
+    "cb_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOi0xLCJpYXQiOjE3Mzg3ODU4MzIsInNpZCI6IjQ1ZDU2MTY3LTU5ZTEtNGYzMS1hMjQ2LThkODIyNzA0OTZhNCIsInR0IjoxLCJ1aWQiOiJkMDkwOWVmYTBjZDhlNmZhYmJiOGQzZDljZjliMDEiLCJ1dCI6Mn0.X6Lqc-9r6mmk-igfN_HNwxIyJT8LH60RE1ChQpTirMk",
+    "cb_ttl_override": -1,
+    "email": "iva_admin@clearblade.com",
+    "email_lower_case": "iva_admin@clearblade.com",
+    "first_name": null,
+    "group_ids": null,
+    "invite_expiry": null,
+    "invite_status": null,
+    "last_name": null,
+    "oidc_enabled": false,
+    "phone": "",
+    "photo_url": null,
+    "pin": null,
+    "terms_agreement": null,
+    "user_preferences": null,
+    "user_type": ""
+}

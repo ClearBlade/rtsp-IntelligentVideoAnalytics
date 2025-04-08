@@ -1,3 +1,82 @@
 {
-    "columns": null
+    "columns": [
+        {
+            "ColumnName": "user_type",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "first_name",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "last_name",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "photo_url",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "pin",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "areas",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "assets",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "group_ids",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "terms_agreement",
+            "ColumnType": "jsonb",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "app_tour",
+            "ColumnType": "jsonb",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "user_preferences",
+            "ColumnType": "jsonb",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "invite_status",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        },
+        {
+            "ColumnName": "invite_expiry",
+            "ColumnType": "string",
+            "PK": false,
+            "UserDefined": true
+        }
+    ]
 }

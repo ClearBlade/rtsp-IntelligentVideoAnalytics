@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import VerticalTabs from "../components/VerticalTabs";
 import {
-  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -11,7 +10,6 @@ import {
   makeStyles,
   Snackbar,
   Theme,
-  Typography,
 } from "@material-ui/core";
 import EditableDeviceForm, { Device } from "../components/EditableDeviceForm";
 import Tasks, { Task } from "../components/Tasks";
@@ -21,9 +19,8 @@ import { MultiStepModalStep } from "../components/MultiStepModal/types";
 import useFetchLatestFeed from "../api/useFetchLatestFeed";
 import { useUpdateTasks } from "../api/useUpdateTasks";
 import { Alert } from "@material-ui/lab";
-import { useDeployToEdge } from "../api/useDeployToEdge";
-import { getAuthInfo } from "../utils/authInfo";
 import EdgeSetup, { Edge } from "../components/EdgeSetup";
+
 const useStyles = makeStyles((theme: Theme) => ({
   dialog: {
     height: "90%",

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import VerticalTabs from "../components/VerticalTabs";
 import {
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -10,6 +11,7 @@ import {
   makeStyles,
   Snackbar,
   Theme,
+  Typography,
 } from "@material-ui/core";
 import EditableDeviceForm, { Device } from "../components/EditableDeviceForm";
 import Tasks, { Task } from "../components/Tasks";
@@ -19,7 +21,9 @@ import { MultiStepModalStep } from "../components/MultiStepModal/types";
 import useFetchLatestFeed from "../api/useFetchLatestFeed";
 import { useUpdateTasks } from "../api/useUpdateTasks";
 import { Alert } from "@material-ui/lab";
-
+import { useDeployToEdge } from "../api/useDeployToEdge";
+import { getAuthInfo } from "../utils/authInfo";
+import EdgeSetup, { Edge } from "../components/EdgeSetup";
 const useStyles = makeStyles((theme: Theme) => ({
   dialog: {
     height: "90%",
@@ -42,9 +46,11 @@ export default function IVASetup(props: IVASetupProps) {
     base64: string;
     timestamp: number;
   } | null>(null);
-  const [device, setDevice] = useState<Device | null>();
+  const [device, setDevice] = useState<Device | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [edge, setEdge] = useState<Edge | null>(null);
   const [error, setError] = useState<Error | null>(null);
+
   // {
   //   username: "",
   //   password: "",
@@ -68,7 +74,7 @@ export default function IVASetup(props: IVASetupProps) {
 
   const { isLoading, isFetching, refetch } = useFetchLatestFeed(
     device?.deviceId || "",
-    edgeId || "ivaEdge1" //TODO: Remove "ivaEdge1"
+    edge?.name || ""
   );
 
   const {
@@ -132,11 +138,50 @@ export default function IVASetup(props: IVASetupProps) {
 
   const steps: MultiStepModalStep[] = [
     {
+      Title: "Connect to edge",
+      Content: <EdgeSetup edge={edge} setEdge={setEdge} />,
+      Actions: (
+        <>
+          <Button
+            autoFocus
+            onClick={() =>
+              tabIndex === 0
+                ? setOpenMFE(false)
+                : setTabIndex((prev) => prev - 1)
+            }
+            color="secondary"
+            variant="text"
+            size="small"
+          >
+            Back
+          </Button>
+          <Button
+            autoFocus
+            onClick={() => {
+              if (tabIndex === 0) {
+                setTabIndex((prev) => prev + 1);
+              } else {
+                // save
+                console.log("saving: ", device, tasks);
+                setOpenMFE(false);
+              }
+            }}
+            color="primary"
+            variant="contained"
+            size="small"
+            disabled={edge === null}
+          >
+            {tabIndex !== 2 ? "Next" : "Save"}
+          </Button>
+        </>
+      ),
+    },
+    {
       Title: "Overview",
       Content: (
         <EditableDeviceForm
           device={device || null}
-          edgeId={edgeId || "ivaEdge1"} // TODO: Remove "ivaEdge1"
+          edgeId={edge?.name || ""}
           image={image}
           tasks={tasks}
           setTasks={setTasks}
@@ -178,7 +223,7 @@ export default function IVASetup(props: IVASetupProps) {
             size="small"
             disabled={image === null}
           >
-            {tabIndex === 0 ? "Next" : "Save"}
+            {tabIndex !== 2 ? "Next" : "Save"}
           </Button>
         </>
       ),
@@ -231,7 +276,7 @@ export default function IVASetup(props: IVASetupProps) {
             size="small"
             disabled={image === null}
           >
-            {tabIndex === 0 ? "Next" : "Save"}
+            {tabIndex !== 2 ? "Next" : "Save"}
           </Button>
         </>
       ),
@@ -261,7 +306,8 @@ export default function IVASetup(props: IVASetupProps) {
               tabs={steps}
               tabIndex={tabIndex}
               setTabIndex={setTabIndex}
-              disabled={image === null}
+              disabled={edge === null}
+              image={image}
             />
             {error && (
               <Snackbar
@@ -291,7 +337,7 @@ export default function IVASetup(props: IVASetupProps) {
             <Button
               autoFocus
               onClick={async () => {
-                if (tabIndex === 0) {
+                if (tabIndex !== 2) {
                   setTabIndex((prev) => prev + 1);
                 } else {
                   console.log("saving: ", device, tasks, edgeId);
@@ -299,7 +345,7 @@ export default function IVASetup(props: IVASetupProps) {
                     updateTasks({
                       device,
                       tasks,
-                      edge: edgeId || "ivaEdge1", //TODO: Remove "ivaEdge1",
+                      edge: edge?.name || "",
                     });
                   }
                 }
@@ -307,9 +353,13 @@ export default function IVASetup(props: IVASetupProps) {
               color="primary"
               variant="contained"
               size="small"
-              disabled={image === null || isUpdatingTasks}
+              disabled={
+                tabIndex === 0
+                  ? edge === null
+                  : image === null || isUpdatingTasks
+              }
             >
-              {tabIndex === 0 ? (
+              {tabIndex !== 2 ? (
                 "Next"
               ) : isUpdatingTasks ? (
                 <CircularProgress size={20} />

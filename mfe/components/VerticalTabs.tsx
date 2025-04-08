@@ -18,6 +18,10 @@ interface VerticalTabsProps {
   tabIndex: number;
   setTabIndex: (index: number) => void;
   disabled: boolean;
+  image: {
+    base64: string;
+    timestamp: number;
+  } | null;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -89,6 +93,7 @@ export default function VerticalTabs({
   tabIndex,
   setTabIndex,
   disabled,
+  image,
 }: VerticalTabsProps) {
   const classes = useStyles();
 
@@ -114,7 +119,9 @@ export default function VerticalTabs({
               key={index}
               label={<Typography variant="body1">{tab.Title}</Typography>}
               {...a11yProps(index)}
-              disabled={index !== 0 && disabled} // TODO: change this to: index !== 0 && disabled
+              disabled={
+                index === 0 ? false : index === 1 ? disabled : image === null
+              }
             />
           ))}
         </Tabs>

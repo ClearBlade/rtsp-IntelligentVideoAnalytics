@@ -1,0 +1,16 @@
+{
+    "auto_balance": true,
+    "auto_restart": null,
+    "concurrency": 1,
+    "dependencies": "log,mqtt,JSUtils,clearblade_async",
+    "execution_timeout": -1,
+    "log_ttl_minutes": 10080,
+    "logging_enabled": true,
+    "name": "ivaNormalizer",
+    "params": [
+        ""
+    ],
+    "run_on_edge": true,
+    "run_on_platform": true,
+    "run_user": ""
+}

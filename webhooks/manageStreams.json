@@ -1,0 +1,6 @@
+{
+    "auth_method": "clearblade_auth",
+    "description": "",
+    "name": "manageStreams",
+    "service_name": "manageStreams"
+}

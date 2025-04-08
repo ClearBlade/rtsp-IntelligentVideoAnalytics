@@ -1,0 +1,6 @@
+{
+    "auth_method": "clearblade_auth",
+    "description": "",
+    "name": "rtsp_getEdges",
+    "service_name": "rtsp_getEdges"
+}

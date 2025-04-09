@@ -30,7 +30,7 @@ const fetchMappings = async (task_uuid: string) => {
   const { url } = getPlatformInfo();
   const { systemKey, userToken } = getAuthInfo();
 
-  const queryString = `?query=${encodeURIComponent(JSON.stringify({ task_uuid }))}`;
+  const queryString = `?query=${encodeURIComponent(JSON.stringify({"FILTERS":[[{"EQ":[{"task_uuid": task_uuid}]}]]}))}`;
 
   const response = await fetch(`${url}/api/v/1/collection/${systemKey}/rtsp_targets${queryString}`, {
     method: 'GET',
@@ -52,7 +52,7 @@ const fetchDeviceDetails = async (deviceId: string): Promise<Device & { tasks: T
   const { url } = getPlatformInfo();
   const { systemKey, userToken } = getAuthInfo();
 
-  const queryString = `?query=${encodeURIComponent(JSON.stringify({ device_id: deviceId }))}`;
+  const queryString = `?query=${encodeURIComponent(JSON.stringify({"FILTERS":[[{"EQ":[{"device_id": deviceId}]}]]}))}`;
 
   const response = await fetch(`${url}/api/v/1/collection/${systemKey}/rtsp_configs${queryString}`, {
     method: 'GET',

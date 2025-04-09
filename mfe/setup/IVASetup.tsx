@@ -23,7 +23,7 @@ import EdgeSetup, { Edge } from "../components/EdgeSetup";
 
 const useStyles = makeStyles((theme: Theme) => ({
   dialog: {
-    height: "90%",
+    height: "90vh",
   },
 }));
 
@@ -47,7 +47,7 @@ export default function IVASetup(props: IVASetupProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [edge, setEdge] = useState<Edge | null>(null);
   const [error, setError] = useState<Error | null>(null);
-
+  const [isSuccess, setIsSuccess] = useState(false);
   // {
   //   username: "",
   //   password: "",
@@ -74,14 +74,10 @@ export default function IVASetup(props: IVASetupProps) {
     edge?.name || ""
   );
 
-  const {
-    mutate: updateTasks,
-    isLoading: isUpdatingTasks,
-    error: updateTasksError,
-    isError,
-  } = useUpdateTasks(
+  const { mutate: updateTasks, isLoading: isUpdatingTasks } = useUpdateTasks(
     () => {
       setOpenMFE(false);
+      setIsSuccess(true);
     },
     (error) => {
       setError(error);
@@ -141,11 +137,7 @@ export default function IVASetup(props: IVASetupProps) {
         <>
           <Button
             autoFocus
-            onClick={() =>
-              tabIndex === 0
-                ? setOpenMFE(false)
-                : setTabIndex((prev) => prev - 1)
-            }
+            onClick={() => setOpenMFE(false)}
             color="secondary"
             variant="text"
             size="small"
@@ -154,21 +146,13 @@ export default function IVASetup(props: IVASetupProps) {
           </Button>
           <Button
             autoFocus
-            onClick={() => {
-              if (tabIndex === 0) {
-                setTabIndex((prev) => prev + 1);
-              } else {
-                // save
-                console.log("saving: ", device, tasks);
-                setOpenMFE(false);
-              }
-            }}
+            onClick={() => setTabIndex((prev) => prev + 1)}
             color="primary"
             variant="contained"
             size="small"
             disabled={edge === null}
           >
-            {tabIndex !== 2 ? "Next" : "Save"}
+            Next
           </Button>
         </>
       ),
@@ -180,8 +164,6 @@ export default function IVASetup(props: IVASetupProps) {
           device={device || null}
           edgeId={edge?.name || ""}
           image={image}
-          tasks={tasks}
-          setTasks={setTasks}
           isSetup={true}
           refresh={refresh}
           isRefreshing={isFetching || isLoading}
@@ -193,11 +175,7 @@ export default function IVASetup(props: IVASetupProps) {
         <>
           <Button
             autoFocus
-            onClick={() =>
-              tabIndex === 0
-                ? setOpenMFE(false)
-                : setTabIndex((prev) => prev - 1)
-            }
+            onClick={() => setTabIndex((prev) => prev - 1)}
             color="secondary"
             variant="text"
             size="small"
@@ -206,21 +184,13 @@ export default function IVASetup(props: IVASetupProps) {
           </Button>
           <Button
             autoFocus
-            onClick={() => {
-              if (tabIndex === 0) {
-                setTabIndex((prev) => prev + 1);
-              } else {
-                // save
-                console.log("saving: ", device, tasks);
-                setOpenMFE(false);
-              }
-            }}
+            onClick={() => setTabIndex((prev) => prev + 1)}
             color="primary"
             variant="contained"
             size="small"
             disabled={image === null}
           >
-            {tabIndex !== 2 ? "Next" : "Save"}
+            Next
           </Button>
         </>
       ),
@@ -246,11 +216,7 @@ export default function IVASetup(props: IVASetupProps) {
         <>
           <Button
             autoFocus
-            onClick={() =>
-              tabIndex === 0
-                ? setOpenMFE(false)
-                : setTabIndex((prev) => prev - 1)
-            }
+            onClick={() => setTabIndex((prev) => prev - 1)}
             color="secondary"
             variant="text"
             size="small"
@@ -260,12 +226,12 @@ export default function IVASetup(props: IVASetupProps) {
           <Button
             autoFocus
             onClick={() => {
-              if (tabIndex === 0) {
-                setTabIndex((prev) => prev + 1);
-              } else {
-                // save
-                console.log("saving: ", device, tasks);
-                setOpenMFE(false);
+              if (device) {
+                updateTasks({
+                  device,
+                  tasks,
+                  edge: edge?.name || "",
+                });
               }
             }}
             color="primary"
@@ -273,7 +239,7 @@ export default function IVASetup(props: IVASetupProps) {
             size="small"
             disabled={image === null}
           >
-            {tabIndex !== 2 ? "Next" : "Save"}
+            {isUpdatingTasks ? <CircularProgress size={20} /> : "Save"}
           </Button>
         </>
       ),
@@ -283,89 +249,107 @@ export default function IVASetup(props: IVASetupProps) {
   return (
     <>
       {deviceType === "desktop" ? (
-        <Dialog
-          scroll="paper"
-          fullWidth
-          maxWidth="md"
-          disablePortal
-          open={openMFE}
-          onClose={() => {
-            setOpenMFE(false);
-          }}
-          aria-labelledby="form-dialog-title"
-          className={classes.dialog}
-        >
-          <DialogTitle id="form-dialog-title">
-            {"New RTSP camera device"}
-          </DialogTitle>
-          <DialogContent style={{ padding: 0 }} dividers>
-            <VerticalTabs
-              tabs={steps}
-              tabIndex={tabIndex}
-              setTabIndex={setTabIndex}
-              disabled={edge === null}
-              image={image}
-            />
-            {error && (
-              <Snackbar
-                open={true}
-                autoHideDuration={4000}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-                onClose={() => setError(null)}
-              >
-                <Alert severity="error">{error.message}</Alert>
-              </Snackbar>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button
-              autoFocus
-              onClick={() =>
-                tabIndex === 0
-                  ? setOpenMFE(false)
-                  : setTabIndex((prev) => prev - 1)
-              }
-              color="secondary"
-              variant="text"
-              size="small"
-            >
-              Back
-            </Button>
-            <Button
-              autoFocus
-              onClick={async () => {
-                if (tabIndex !== 2) {
-                  setTabIndex((prev) => prev + 1);
-                } else {
-                  console.log("saving: ", device, tasks, edgeId);
-                  if (device) {
-                    updateTasks({
-                      device,
-                      tasks,
-                      edge: edge?.name || "",
-                    });
-                  }
-                }
-              }}
-              color="primary"
-              variant="contained"
-              size="small"
-              disabled={
-                tabIndex === 0
-                  ? edge === null
-                  : image === null || isUpdatingTasks
-              }
-            >
-              {tabIndex !== 2 ? (
-                "Next"
-              ) : isUpdatingTasks ? (
-                <CircularProgress size={20} />
-              ) : (
-                "Save"
+        <>
+          <Dialog
+            scroll="paper"
+            fullWidth
+            maxWidth="md"
+            disablePortal
+            open={openMFE}
+            onClose={() => {
+              setOpenMFE(false);
+            }}
+            aria-labelledby="form-dialog-title"
+            PaperProps={{
+              style: {
+                height: "80%",
+                maxHeight: "80%",
+                overflow: "auto",
+              },
+            }}
+          >
+            <DialogTitle id="form-dialog-title">
+              {"New RTSP camera device"}
+            </DialogTitle>
+            <DialogContent style={{ padding: 0 }} dividers>
+              <VerticalTabs
+                tabs={steps}
+                tabIndex={tabIndex}
+                setTabIndex={setTabIndex}
+                disabled={edge === null}
+                image={image}
+              />
+              {error && (
+                <Snackbar
+                  open={true}
+                  autoHideDuration={4000}
+                  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                  onClose={() => setError(null)}
+                >
+                  <Alert severity="error">{error.message}</Alert>
+                </Snackbar>
               )}
-            </Button>
-          </DialogActions>
-        </Dialog>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                autoFocus
+                onClick={() =>
+                  tabIndex === 0
+                    ? setOpenMFE(false)
+                    : setTabIndex((prev) => prev - 1)
+                }
+                color="secondary"
+                variant="text"
+                size="small"
+              >
+                Back
+              </Button>
+              <Button
+                autoFocus
+                onClick={async () => {
+                  if (tabIndex !== 2) {
+                    setTabIndex((prev) => prev + 1);
+                  } else {
+                    console.log("saving: ", device, tasks, edgeId);
+                    if (device) {
+                      updateTasks({
+                        device,
+                        tasks,
+                        edge: edge?.name || "",
+                      });
+                    }
+                  }
+                }}
+                color="primary"
+                variant="contained"
+                size="small"
+                disabled={
+                  tabIndex === 0
+                    ? edge === null
+                    : image === null || isUpdatingTasks
+                }
+              >
+                {tabIndex !== 2 ? (
+                  "Next"
+                ) : isUpdatingTasks ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </DialogActions>
+          </Dialog>
+          {isSuccess && (
+            <Snackbar
+              open={true}
+              autoHideDuration={4000}
+              anchorOrigin={{ vertical: "top", horizontal: "center" }}
+              onClose={() => setIsSuccess(false)}
+            >
+              <Alert severity="success">Saved successfully</Alert>
+            </Snackbar>
+          )}
+        </>
       ) : (
         <MultiStepModal
           MainTitle="New RTSP camera device"

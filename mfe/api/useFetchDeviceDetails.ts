@@ -26,7 +26,29 @@ interface DeviceConfig {
   edge: string;
 }
 
-const fetchDeviceDetails = async (deviceId: string): Promise<Device & { tasks: Task[] }> => {
+const fetchMappings = async (task_uuid: string) => {
+  const { url } = getPlatformInfo();
+  const { systemKey, userToken } = getAuthInfo();
+
+  const queryString = `?query=${encodeURIComponent(JSON.stringify({ task_uuid }))}`;
+
+  const response = await fetch(`${url}/api/v/1/collection/${systemKey}/rtsp_targets${queryString}`, {
+    method: 'GET',
+    headers: {
+      'Clearblade-UserToken': userToken,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch mappings: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  return data.DATA[0].mappings;
+}
+
+const fetchDeviceDetails = async (deviceId: string): Promise<Device & { tasks: Task[], edge: string }> => {
   const { url } = getPlatformInfo();
   const { systemKey, userToken } = getAuthInfo();
 
@@ -51,6 +73,16 @@ const fetchDeviceDetails = async (deviceId: string): Promise<Device & { tasks: T
 
   const deviceConfig = data.DATA[0];
 
+  const tasks = await Promise.all(deviceConfig.tasks.map(async (task) => {
+    const mappings = await fetchMappings(task.uuid);
+    return {
+      ...task,
+      mappings,
+    };
+  }));
+  
+  console.log("tasks: ", tasks);
+
   return {
     deviceId: deviceConfig.device_id,
     deviceName: deviceConfig.device_name,
@@ -61,7 +93,8 @@ const fetchDeviceDetails = async (deviceId: string): Promise<Device & { tasks: T
     streamingChannel: deviceConfig.credentials.streamingChannel,
     username: deviceConfig.credentials.username,
     rootPath: deviceConfig.root_path,
-    tasks: deviceConfig.tasks,
+    tasks,
+    edge: deviceConfig.edge,
   };
 };
 

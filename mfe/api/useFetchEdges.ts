@@ -51,7 +51,9 @@ const fetchEdges = async (): Promise<Edge[]> => {
 
 const useFetchEdges = () => {
   return useQuery(['edges'], () => fetchEdges(), {
-    retry: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    keepPreviousData: true,
   });
 };
 

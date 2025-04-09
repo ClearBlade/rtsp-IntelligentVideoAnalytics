@@ -66,7 +66,7 @@ const addDeviceDetailsToCollection = async (device: Device, edge: string, url: s
         streamingChannel: device.streamingChannel 
       },
       root_path: device.rootPath,
-      tasks: [],
+      // tasks: [],
       edge: edge
     }),
   });

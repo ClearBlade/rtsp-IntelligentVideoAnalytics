@@ -33,12 +33,17 @@ const useStyles = makeStyles((theme) => ({
 
 function ConfigureBucketSet({
   rootPath,
-  device,
-  setDevice,
+  selectedBucketSet,
+  setSelectedBucketSet,
 }: {
   rootPath: { id: string; path: string } | undefined;
-  device: Device | null;
-  setDevice: (device: Device) => void;
+  selectedBucketSet: { id: string; path: string } | null;
+  setSelectedBucketSet: React.Dispatch<
+    React.SetStateAction<{
+      id: string;
+      path: string;
+    } | null>
+  >;
 }) {
   const classes = useStyles();
   const { setFieldValue } = useFormikContext<Device>();
@@ -73,18 +78,10 @@ function ConfigureBucketSet({
   const handleBucketSetChange = (value: string) => {
     const newRootPath = getBucketSetPath(value);
     setFieldValue("rootPath", newRootPath);
-    if (device) {
-      setDevice({ ...device, rootPath: newRootPath });
+    if (selectedBucketSet) {
+      setSelectedBucketSet(newRootPath);
     }
   };
-
-  if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center">
-        <CircularProgress size={20} />
-      </Box>
-    );
-  }
 
   if (isError) {
     return (
@@ -107,7 +104,7 @@ function ConfigureBucketSet({
             </Typography>
             <Link
               // href="" /settings/storage-locations
-              href="https://www.google.com"
+              href="https://www.google.com" // TODO: add link to storage locations
               target="_blank"
               color="secondary"
             >
@@ -141,7 +138,7 @@ function ConfigureBucketSet({
               size="small"
               onClick={() => {
                 window.open(
-                  "http://localhost:8081/ia/iva/settings/system",
+                  "http://localhost:8081/ia/iva/settings/system", // TODO: add link to storage locations
                   "_blank"
                 );
               }}
@@ -175,6 +172,7 @@ function ConfigureBucketSet({
             size="small"
             value={getBucketSetName(rootPath)}
             onChange={(e) => handleBucketSetChange(e.target.value)}
+            disabled={isLoading}
             SelectProps={{
               displayEmpty: true,
               renderValue: (value) => {

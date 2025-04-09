@@ -1,22 +1,7 @@
-import { ComponentsProps } from "../types";
-import React, { useEffect, useState } from "react";
-import VerticalTabs from "../components/VerticalTabs";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  makeStyles,
-  Paper,
-  Tab,
-  Tabs,
-  Typography,
-} from "@material-ui/core";
+import React, { useState } from "react";
+import { Box, makeStyles, Paper, Tab, Tabs } from "@material-ui/core";
 import EditableDeviceForm, { Device } from "../components/EditableDeviceForm";
-import Tasks, { Task } from "../components/Tasks";
-import useFetchDeviceTasks from "../api/useFetchDeviceTasks";
+import { Task } from "../components/Tasks";
 import useFetchDeviceDetails from "../api/useFetchDeviceDetails";
 import useFetchDeviceFeed from "../api/useFetchDeviceFeed";
 import TaskTable from "../components/TaskTable";
@@ -91,7 +76,7 @@ const IVADetails = (props: {
     isLoading: isLoadingLatestFeed,
     isFetching: isFetchingLatestFeed,
     refetch: refetchLatestFeed,
-  } = useFetchLatestFeed(device?.deviceId || "", "ivaEdge1"); // this is the refetching the latest feed
+  } = useFetchLatestFeed(device?.deviceId || "", deviceDetails?.edge || ""); // this is the refetching the latest feed
 
   const refresh = async () => {
     if (device) {
@@ -108,15 +93,17 @@ const IVADetails = (props: {
   const isLoading = isDeviceLoading || isFeedLoading;
   const isError = isDeviceError || isFeedError;
 
-  useEffect(() => {
-    if (deviceDetails) setDevice(deviceDetails);
-    if (deviceDetails?.tasks) setTasks(deviceDetails.tasks);
-    if (deviceFeed)
-      setImage({
-        base64: deviceFeed.image,
-        timestamp: new Date(deviceFeed.timestamp).getTime(),
-      });
-  }, [deviceDetails, deviceFeed]);
+  // Update state based on deviceDetails and deviceFeed
+  if (deviceDetails && !device) {
+    setDevice(deviceDetails);
+    setTasks(deviceDetails.tasks);
+  }
+  if (deviceFeed && !image) {
+    setImage({
+      base64: deviceFeed.image,
+      timestamp: new Date(deviceFeed.timestamp).getTime(),
+    });
+  }
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -169,10 +156,8 @@ const IVADetails = (props: {
       </Paper>
       <TabPanel value={value} index={0}>
         <EditableDeviceForm
-          tasks={tasks || []}
-          setTasks={setTasks}
           device={device}
-          edgeId={"test"}
+          edgeId={deviceDetails?.edge || ""}
           image={image}
           setDevice={setDevice}
           setImage={setImage}
@@ -184,8 +169,8 @@ const IVADetails = (props: {
       <TabPanel value={value} index={1}>
         {tasks && (
           <TaskTable
-            deviceId={device?.deviceId || ""}
-            edgeId={"test"}
+            device={device}
+            edgeId={deviceDetails?.edge || ""}
             tasks={tasks}
             image={image}
             handleTaskChange={handleTaskChange}

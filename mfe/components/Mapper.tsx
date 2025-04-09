@@ -9,9 +9,8 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { Box, MenuItem, TextField, Typography } from "@material-ui/core";
 import TextWithHelpIcon from "../helpers/TextWithHelpIcon";
-import { fetchAssets } from "@clearblade/ia-mfe-core"; // TODO - Can use custom hook here for fetching assets but doesn't give the schema
-import { useQuery } from "react-query";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { useFetchAssetsWithAttrs } from "../api/useFetchAssetsWithAttrs";
 
 const columns = [
   {
@@ -41,11 +40,8 @@ export interface Mappings {
 }
 
 interface MapperProps {
-  // rootPath: { id: string; path: string } | undefined;
   mappings: Mappings[];
-  assets: { id: string; label: string; attributes: Record<string, any>[] }[];
   onMappingsChange: (mappings: Mappings[]) => void;
-  // onRootPathChange: (path: { id: string; path: string }) => void;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -60,71 +56,71 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export default function Mapper({
-  mappings,
-  assets,
-  onMappingsChange,
-}: MapperProps) {
+export default function Mapper({ mappings, onMappingsChange }: MapperProps) {
   const classes = useStyles();
-  // const [rows, setRows] = React.useState<Mappings[]>([]);
 
-  // const {
-  //   data: assetsIA,
-  //   isLoading: isLoadingAssets,
-  //   isError: isErrorAssets,
-  // } = useQuery({
-  //   queryKey: ["assets"],
-  //   queryFn: () => fetchAssetTypeTree(new AbortController(), {}),
-  // });
+  const { data: assets, isLoading, isError } = useFetchAssetsWithAttrs();
 
   const handleChange = (event, rowIndex, column, assetId) => {
-    const asset = assets.find(
-      (asset) => asset.id === (assetId || event.target.value)
-    );
-    // if (!asset) return;
+    const newMappings = [...mappings];
+    const newValue = event.target.value;
 
-    const newRows = [...mappings];
+    if (column === "target_asset") {
+      const selectedAsset = assets.DATA.find((asset) => asset.id === newValue);
+      newMappings[rowIndex] = {
+        ...newMappings[rowIndex],
+        target_asset: {
+          id: newValue,
+          label: selectedAsset?.label || "",
+        },
+        target_attribute: { id: "", label: "" },
+      };
+    } else if (column === "target_attribute") {
+      const currentAssetId = newMappings[rowIndex].target_asset.id;
+      if (!currentAssetId || !newValue) {
+        newMappings[rowIndex] = {
+          ...newMappings[rowIndex],
+          target_attribute: { id: "", label: "" },
+        };
+      } else {
+        const selectedAsset = assets.DATA.find(
+          (asset) => asset.id === currentAssetId
+        );
+        const selectedAttribute = selectedAsset?.attributes.find(
+          (attribute) => attribute.id === newValue
+        );
 
-    newRows[rowIndex][column] = {
-      id: event.target.value,
-      label:
-        column === "target_asset"
-          ? asset?.label ?? ""
-          : asset?.attributes.find(
-              (attribute) => attribute.id === event.target.value
-            )?.label ?? "",
-    };
+        if (selectedAttribute) {
+          newMappings[rowIndex] = {
+            ...newMappings[rowIndex],
+            target_attribute: {
+              id: newValue,
+              label: selectedAttribute.label,
+            },
+          };
+        } else {
+          newMappings[rowIndex] = {
+            ...newMappings[rowIndex],
+            target_attribute: { id: "", label: "" },
+          };
+        }
+      }
+    }
 
-    onMappingsChange(newRows);
+    onMappingsChange(newMappings);
   };
 
-  // useEffect(() => {
-  //   setRows(
-  //     mappings.map((map) => ({
-  //       device_output: map.device_output ?? { id: "", label: "" },
-  //       target_asset: map.target_asset ?? { id: "", label: "" },
-  //       target_attribute: map.target_attribute ?? { id: "", label: "" },
-  //     }))
-  //   );
-  // }, [mappings]);
+  if (isLoading) {
+    return <CircularProgress size={20} />;
+  }
 
-  // useEffect(() => {
-  //   onMappingsChange(rows);
-  // }, [rows]);
-
-  // if (isLoadingAssets) {
-  //   return <CircularProgress size={20} />;
-  // }
-
-  // if (isErrorAssets) {
-  //   return (
-  //     <Typography variant="body2" color="textSecondary">
-  //       Error loading assets
-  //     </Typography>
-  //   );
-  // }
-
-  // console.log(assetsIA);
+  if (isError) {
+    return (
+      <Typography variant="body2" color="textSecondary">
+        Error loading assets
+      </Typography>
+    );
+  }
 
   return (
     <>
@@ -133,12 +129,6 @@ export default function Mapper({
           Data destinations
         </Typography>
       </Box>
-      {/* <Box>
-        <ConfigureBucketSet
-          rootPath={rootPath}
-          onRootPathChange={onRootPathChange}
-        />
-      </Box> */}
       <TextWithHelpIcon
         label="Data output mappings"
         helpText="Map the device's outputs to an assets' custom attributes. Assets must be created first to enable mapping. To receive alerts about asset status changes, set up rule types and rules to monitor target attributes."
@@ -171,7 +161,6 @@ export default function Mapper({
                       value={row.target_asset.id || ""}
                       name="target_asset"
                       onChange={(e) => {
-                        // console.log(e);
                         handleChange(e, rowIndex, "target_asset", "");
                       }}
                       InputProps={{
@@ -187,7 +176,7 @@ export default function Mapper({
                               </Typography>
                             );
                           }
-                          const selectedAsset = assets.find(
+                          const selectedAsset = assets.DATA.find(
                             (asset) => asset.id === value
                           );
                           return selectedAsset ? (
@@ -195,12 +184,6 @@ export default function Mapper({
                               <Typography variant="body2">
                                 {selectedAsset.label}
                               </Typography>
-                              {/* <Typography
-                                variant="caption"
-                                color="textSecondary"
-                              >
-                                {selectedAsset?.id}
-                              </Typography> */}
                             </>
                           ) : (
                             <Typography variant="body2" color="textSecondary">
@@ -215,7 +198,7 @@ export default function Mapper({
                           {"Select asset"}
                         </Typography>
                       </MenuItem>
-                      {assets.map((asset) => (
+                      {assets.DATA.map((asset) => (
                         <MenuItem key={asset.id} value={asset.id}>
                           <Box>
                             <Typography variant="body2">
@@ -258,7 +241,7 @@ export default function Mapper({
                               </Typography>
                             );
                           }
-                          const selectedAsset = assets.find(
+                          const selectedAsset = assets.DATA.find(
                             (asset) => asset.id === row.target_asset.id
                           );
                           const selectedAttribute =
@@ -270,12 +253,6 @@ export default function Mapper({
                               <Typography variant="body2">
                                 {selectedAttribute.label}
                               </Typography>
-                              {/* <Typography
-                                variant="caption"
-                                color="textSecondary"
-                              >
-                                {selectedAsset?.id}
-                              </Typography> */}
                             </>
                           ) : (
                             <Typography variant="body2" color="textSecondary">
@@ -290,15 +267,15 @@ export default function Mapper({
                           {"Select attribute"}
                         </Typography>
                       </MenuItem>
-                      {assets
-                        .find((asset) => asset.id === row.target_asset.id)
-                        ?.attributes.map((attribute) => (
-                          <MenuItem key={attribute.id} value={attribute.id}>
-                            <Typography variant="body2">
-                              {attribute.label}
-                            </Typography>
-                          </MenuItem>
-                        ))}
+                      {assets.DATA.find(
+                        (asset) => asset.id === row.target_asset.id
+                      )?.attributes.map((attribute) => (
+                        <MenuItem key={attribute.id} value={attribute.id}>
+                          <Typography variant="body2">
+                            {attribute.label}
+                          </Typography>
+                        </MenuItem>
+                      ))}
                     </TextField>
                   </TableCell>
                 </TableRow>

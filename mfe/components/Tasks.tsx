@@ -419,36 +419,6 @@ export const TaskCardContent = ({
                     ? getMappingStruct()
                     : task.mappings
                 }
-                assets={[
-                  {
-                    id: "ce6e8b9d-9150-4b1b-92a4-d3e17acc8ad4",
-                    label: "Store Entrance Camera",
-                    attributes: [
-                      {
-                        id: "people_entered",
-                        label: "People entered",
-                      },
-                      {
-                        id: "total_people",
-                        label: "Total people in store",
-                      },
-                    ],
-                  },
-                  {
-                    id: "asfsa43-9150-4b1b-92a4-d3e17acc8ad4",
-                    label: "Lakehouse Camera",
-                    attributes: [
-                      {
-                        id: "boat_entered",
-                        label: "Boat entered",
-                      },
-                      {
-                        id: "total_boats",
-                        label: "Total boats in lake",
-                      },
-                    ],
-                  },
-                ]}
                 onMappingsChange={handleMappingChange}
               />
             </Grid>

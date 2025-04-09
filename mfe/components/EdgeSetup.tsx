@@ -13,7 +13,6 @@ import CustomTextField from "../helpers/CustomTextField";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import useFetchEdges from "../api/useFetchEdges";
 import { useDeployToEdge } from "../api/useDeployToEdge";
-import useIsMobileOrTab from "../hooks/useIsMobileOrTab";
 
 export interface Edge {
   name: string;
@@ -52,7 +51,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 function EdgeSetup({ edge, setEdge }: EdgeSetupProps) {
-  const deviceType = useIsMobileOrTab();
   const classes = useStyles();
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(edge);
   const [error, setError] = useState<string | null>(null);
@@ -88,7 +86,7 @@ function EdgeSetup({ edge, setEdge }: EdgeSetupProps) {
     );
   }
   return (
-    <Box width={deviceType === "mobile" ? "100%" : "80%"}>
+    <Box>
       <Typography
         className={classes.typographyText}
         variant="h5"
@@ -107,7 +105,7 @@ function EdgeSetup({ edge, setEdge }: EdgeSetupProps) {
         in your system first before adding RTSP devices.
       </Typography>
       <Grid container spacing={2} className={classes.gridContainer}>
-        <Grid item xs={12} md={10}>
+        <Grid item xs={12} md={7}>
           <CustomTextField
             select
             label="Select edge*"
@@ -139,7 +137,7 @@ function EdgeSetup({ edge, setEdge }: EdgeSetupProps) {
         <Grid
           item
           xs={12}
-          md={2}
+          md={3}
           alignContent="flex-end"
           justifyContent="flex-end"
         >
@@ -170,7 +168,7 @@ function EdgeSetup({ edge, setEdge }: EdgeSetupProps) {
             )}
           </Button>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} md={9}>
           {error && (
             <Alert severity="error" variant="outlined">
               <AlertTitle>Edge connection failed</AlertTitle>

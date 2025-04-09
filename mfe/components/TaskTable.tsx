@@ -16,6 +16,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  Snackbar,
   Theme,
   Tooltip,
   Typography,
@@ -28,7 +29,9 @@ import TextWithIcon from "../helpers/TextWithIcon";
 import AddIcon from "@material-ui/icons/Add";
 import { TASK_STORE } from "./tasks/TaskStore";
 import { v4 as uuid } from "uuid";
-
+import { useUpdateTasks } from "../api/useUpdateTasks";
+import { Device } from "./EditableDeviceForm";
+import { Alert } from "@material-ui/lab";
 const columns = [
   {
     id: "name",
@@ -51,7 +54,7 @@ const columns = [
 ];
 
 interface TaskTableProps {
-  deviceId: string;
+  device: Device | null;
   edgeId: string;
   tasks: Task[];
   image: { base64: string; timestamp: number } | null;
@@ -82,7 +85,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export default function TaskTable({
-  deviceId,
+  device,
   edgeId,
   tasks,
   image,
@@ -97,8 +100,23 @@ export default function TaskTable({
   const [task, setTask] = useState<Task | null>(null);
   const [openTaskCard, setOpenTaskCard] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] =
     useState<boolean>(false);
+
+  const {
+    mutate: updateTasks,
+    isLoading: isUpdatingTasks,
+    error: updateTasksError,
+  } = useUpdateTasks(
+    () => {
+      setIsSuccess(true);
+    },
+    () => {
+      setIsError(true);
+    }
+  );
 
   const getTaskTypeDetails = (type: string) => {
     const task = TASK_STORE.find((task) => task.id === type);
@@ -106,29 +124,69 @@ export default function TaskTable({
     return task;
   };
 
-  // const handleChange = (event, rowIndex, column, assetId) => {
-  //   const asset = assets.find(
-  //     (asset) => asset.id === (assetId || event.target.value)
-  //   );
-  //   if (!asset) return;
+  const handleTaskUpdate = (updatedTasks: Task[]) => {
+    if (!device || !edgeId) return;
+    updateTasks({
+      device,
+      tasks: updatedTasks,
+      edge: edgeId,
+    });
+  };
 
-  //   const newRows = [...mappings];
+  const handleEditing = (task: Task) => {
+    handleTaskChange(task);
+    setTasks((prev) => {
+      if (!prev) return null;
+      const newTasks = [...prev];
+      const index = newTasks.findIndex((t) => t.uuid === task.uuid);
+      if (index !== -1) {
+        newTasks[index] = task;
+      }
+      handleTaskUpdate(newTasks);
+      return newTasks;
+    });
+  };
 
-  //   newRows[rowIndex][column] = {
-  //     id: event.target.value,
-  //     label:
-  //       column === "target_asset"
-  //         ? asset?.label ?? ""
-  //         : asset.attributes.find(
-  //             (attribute) => attribute.id === event.target.value
-  //           )?.label ?? "",
-  //   };
+  const handleDeleting = (uuid: string) => {
+    handleDeleteTask(uuid);
+    setTasks((prev) => {
+      if (!prev) return null;
+      const newTasks = prev.filter((task) => task.uuid !== uuid);
+      handleTaskUpdate(newTasks);
+      return newTasks;
+    });
+  };
 
-  //   onMappingsChange(newRows);
-  // };
+  const handleAdding = (task: Task) => {
+    setTasks((prev) => {
+      if (!prev) return null;
+      handleTaskUpdate([...prev, task]);
+      return [...prev, task];
+    });
+  };
 
   return (
-    <Box className="rajasClass">
+    <Box className={classes.root}>
+      {isError && updateTasksError && (
+        <Snackbar
+          open={true}
+          autoHideDuration={4000}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => setIsError(false)}
+        >
+          <Alert severity="error">{updateTasksError.message}</Alert>
+        </Snackbar>
+      )}
+      {isSuccess && (
+        <Snackbar
+          open={true}
+          autoHideDuration={4000}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => setIsSuccess(false)}
+        >
+          <Alert severity="success">Tasks updated successfully</Alert>
+        </Snackbar>
+      )}
       <Box display="flex" style={{ gap: 8 }}>
         <Typography
           className={classes.typographyText}
@@ -266,7 +324,7 @@ export default function TaskTable({
         <DialogContent>
           {task && (
             <TaskCardContent
-              deviceId={deviceId}
+              deviceId={device?.deviceId || ""}
               edgeId={edgeId}
               task={task}
               onTaskChange={setTask}
@@ -288,18 +346,16 @@ export default function TaskTable({
             onClick={() => {
               if (!task) return;
               if (isEditing) {
-                handleTaskChange(task);
+                handleEditing(task);
               } else {
-                setTasks((prev) => {
-                  if (!prev) return null;
-                  return [...prev, task];
-                });
+                handleAdding(task);
               }
               setOpenTaskCard(false);
               setIsEditing(false);
             }}
             color="primary"
             variant="contained"
+            disabled={isUpdatingTasks}
           >
             Save
           </Button>
@@ -320,9 +376,10 @@ export default function TaskTable({
           <Button
             size="small"
             variant="outlined"
+            disabled={isUpdatingTasks}
             onClick={() => {
               if (!task) return;
-              handleDeleteTask(task.uuid);
+              handleDeleting(task.uuid);
               setShowDeleteConfirmation(false);
             }}
           >

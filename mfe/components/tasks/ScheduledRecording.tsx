@@ -1,21 +1,17 @@
 import {
   Box,
   Button,
-  Divider,
   Grid,
-  IconButton,
   makeStyles,
   MenuItem,
   TextField,
   Theme,
-  Tooltip,
   Typography,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { TaskComponentProps } from "../Tasks";
 import { IntervalGrid } from "./ScheduledSnapshot";
 import CustomTextField from "../../helpers/CustomTextField";
-import HelpIcon from "@material-ui/icons/Help";
 import TextWithHelpIcon from "../../helpers/TextWithHelpIcon";
 
 export const VIDEO_QUALITY = ["Original", "Lower", "Lowest"] as const;

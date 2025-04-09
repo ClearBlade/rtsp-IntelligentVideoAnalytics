@@ -5,17 +5,14 @@ import {
   TextField,
   MenuItem,
   Typography,
-  Divider,
   makeStyles,
   Theme,
-  Switch,
   Box,
   IconButton,
   Tooltip,
   Button,
   Checkbox,
 } from "@material-ui/core";
-import Mapper from "../Mapper";
 import { Autocomplete } from "@material-ui/lab";
 import HelpIcon from "@material-ui/icons/Help";
 import ScheduledSnapshot, { FILETYPE, RESOLUTION } from "./ScheduledSnapshot";
@@ -66,7 +63,12 @@ export const SaveAs = ({
       : ""
   );
 
-  useEffect(() => {
+  const handleSaveAsChange = (newSaveAs: "VIDEO" | "IMAGE" | "") => {
+    // If clicking the same button twice, set to empty string
+    if (saveAs === newSaveAs) {
+      newSaveAs = "";
+    }
+
     // change blur faces to false
     let objects_to_detect = task.settings?.objects_to_detect as object;
     if (!objects_to_detect) return;
@@ -78,7 +80,7 @@ export const SaveAs = ({
       };
     });
 
-    if (saveAs === "IMAGE") {
+    if (newSaveAs === "IMAGE") {
       onTaskChange({
         ...task,
         settings: {
@@ -88,10 +90,12 @@ export const SaveAs = ({
           video_quality: undefined,
           clip_length: undefined,
           clip_length_units: undefined,
+          record_lead_time: undefined,
+          record_lead_time_units: undefined,
           objects_to_detect,
         },
       });
-    } else if (saveAs === "VIDEO") {
+    } else if (newSaveAs === "VIDEO") {
       onTaskChange({
         ...task,
         settings: {
@@ -102,6 +106,9 @@ export const SaveAs = ({
           clip_length: task.settings?.clip_length || 30,
           clip_length_units:
             task.settings?.clip_length_units || INTERVAL_UNITS[0],
+          record_lead_time: task.settings?.record_lead_time || 10,
+          record_lead_time_units:
+            task.settings?.record_lead_time_units || INTERVAL_UNITS[0],
           objects_to_detect,
         },
       });
@@ -115,11 +122,14 @@ export const SaveAs = ({
           video_quality: undefined,
           clip_length: undefined,
           clip_length_units: undefined,
+          record_lead_time: undefined,
+          record_lead_time_units: undefined,
           objects_to_detect,
         },
       });
     }
-  }, [saveAs]);
+    setSaveAs(newSaveAs);
+  };
 
   return (
     <>
@@ -128,7 +138,7 @@ export const SaveAs = ({
           className={classes.toggleButton}
           variant={saveAs === "VIDEO" ? "contained" : "outlined"}
           size="small"
-          onClick={() => setSaveAs((prev) => (prev === "VIDEO" ? "" : "VIDEO"))}
+          onClick={() => handleSaveAsChange("VIDEO")}
           style={{ borderRadius: "4px 0 0 4px" }}
         >
           Video
@@ -137,7 +147,7 @@ export const SaveAs = ({
           className={classes.toggleButton}
           variant={saveAs === "IMAGE" ? "contained" : "outlined"}
           size="small"
-          onClick={() => setSaveAs((prev) => (prev === "IMAGE" ? "" : "IMAGE"))}
+          onClick={() => handleSaveAsChange("IMAGE")}
           style={{ borderRadius: "0 4px 4px 0" }}
         >
           Image

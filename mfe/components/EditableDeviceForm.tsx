@@ -23,8 +23,6 @@ interface EditableDeviceFormProps {
   device: Device | null;
   image: { base64: string; timestamp: number } | null;
   edgeId: string;
-  tasks: Task[];
-  setTasks: (tasks: Task[]) => void;
   isSetup: boolean;
   refresh: () => void;
   isRefreshing: boolean;
@@ -287,8 +285,6 @@ function EditableDeviceForm({
   image,
   edgeId,
   device,
-  tasks,
-  setTasks,
   setImage,
   setDevice,
   isSetup,
@@ -296,6 +292,10 @@ function EditableDeviceForm({
   isRefreshing,
 }: EditableDeviceFormProps) {
   const classes = useStyles();
+  const [selectedBucketSet, setSelectedBucketSet] = useState<{
+    id: string;
+    path: string;
+  } | null>(device?.rootPath || null);
   const [activeForm, setActiveForm] = useState<"CREDENTIALS" | "RTSP">(
     "CREDENTIALS"
   );
@@ -353,7 +353,7 @@ function EditableDeviceForm({
         return false;
       }
 
-      // For setup mode, also check deviceName
+      // For non-setup mode, also check deviceName
       if (
         !isSetup &&
         Boolean(deviceName?.trim())
@@ -373,7 +373,7 @@ function EditableDeviceForm({
         );
       }
 
-      // For non-setup mode, check other fields
+      // For setup mode, check other fields
       return (
         rtspUrl !== device.rtspUrl ||
         ip !== device.ip ||
@@ -403,7 +403,10 @@ function EditableDeviceForm({
           username: "",
           password: "",
         };
-        setDevice(rtspValues);
+        setDevice({
+          ...rtspValues,
+          rootPath: selectedBucketSet || { id: "", path: "" },
+        });
         initiateStream({ edge: edgeId, device: rtspValues });
       } else {
         const rtspValues = {
@@ -411,12 +414,15 @@ function EditableDeviceForm({
           rtspUrl: "",
         };
         if (rtspValues) {
-          setDevice(rtspValues);
+          setDevice({
+            ...rtspValues,
+            rootPath: selectedBucketSet || { id: "", path: "" },
+          });
           initiateStream({ edge: edgeId, device: rtspValues });
         }
       }
     },
-    [activeForm, setDevice, initiateStream, edgeId]
+    [activeForm, setDevice, initiateStream, edgeId, selectedBucketSet]
   );
 
   useEffect(() => {
@@ -636,8 +642,8 @@ function EditableDeviceForm({
             <Box mt={2}>
               <ConfigureBucketSet
                 rootPath={values.rootPath}
-                device={device}
-                setDevice={setDevice}
+                selectedBucketSet={selectedBucketSet}
+                setSelectedBucketSet={setSelectedBucketSet}
               />
             </Box>
             {!isSetup && (
@@ -665,10 +671,7 @@ function EditableDeviceForm({
                       !checkIfValuesChanged(values, device)
                     }
                     onClick={() => {
-                      // TODO: Update task settings root path
-                      // TODO: set device root path and save
-                      // TODO: restart camera feed
-                      console.log("save changes");
+                      handleFormSubmit(values);
                     }}
                     color="secondary"
                   >

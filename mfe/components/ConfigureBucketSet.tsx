@@ -72,7 +72,6 @@ function ConfigureBucketSet({
 
   const handleBucketSetChange = (value: string) => {
     const newRootPath = getBucketSetPath(value);
-    console.log("newRootPath: ", newRootPath);
     setFieldValue("rootPath", newRootPath);
     setSelectedBucketSet(newRootPath);
   };

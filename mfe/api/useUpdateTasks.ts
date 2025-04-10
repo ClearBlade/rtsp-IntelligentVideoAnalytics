@@ -12,7 +12,6 @@ interface UpdateTasksData {
 }
 
 const addTasksToDeviceConfig = async (device: Device, tasks: Omit<Task, 'mappings' | 'isOpen'>[], systemKey: string, url: string, userToken: string) => {
-  console.log('device: ', device)
   const response = await fetch(`${url}/api/v/1/collection/${systemKey}/rtsp_configs`, {
     method: 'PUT',
     headers: {

@@ -34,9 +34,44 @@
             {
                 "Level": 1,
                 "Name": "rtsp_update"
+            },
+            {
+                "Level": 1,
+                "Name": "rtsp_getEdges"
+            },
+            {
+                "Level": 1,
+                "Name": "rtsp_deployToEdge"
+            },
+            {
+                "Level": 1,
+                "Name": "rtsp_addBucketToDeployment"
+            },
+            {
+                "Level": 1,
+                "Name": "ivaNormalizer"
             }
         ],
-        "Collections": [],
+        "Collections": [
+          {
+              "Columns": null,
+              "Items": null,
+              "Level": 15,
+              "Name": "rtsp_configs"
+          },
+          {
+              "Columns": null,
+              "Items": null,
+              "Level": 15,
+              "Name": "rtsp_targets"
+          },
+          {
+              "Columns": null,
+              "Items": null,
+              "Level": 15,
+              "Name": "rtsp_feeds"
+          }
+        ],
         "Deployments": {
             "Level": 0
         },

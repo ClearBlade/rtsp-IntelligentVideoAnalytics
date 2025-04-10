@@ -60,12 +60,10 @@ const IVADetails = (props: {
     isError: isDeviceError,
     error: deviceError,
   } = useFetchDeviceDetails("hik101");
-  // const {
-  //   data: deviceTasks,
-  //   isLoading: isTasksLoading,
-  //   isError: isTasksError,
-  //   error: tasksError,
-  // } = useFetchDeviceTasks("test");
+  const [selectedBucketSet, setSelectedBucketSet] = useState<{
+    id: string;
+    path: string;
+  } | null>(null);
   const {
     data: deviceFeed,
     isLoading: isFeedLoading,
@@ -97,6 +95,7 @@ const IVADetails = (props: {
   if (deviceDetails && !device) {
     setDevice(deviceDetails);
     setTasks(deviceDetails.tasks);
+    setSelectedBucketSet(deviceDetails.rootPath);
   }
   if (deviceFeed && !image) {
     setImage({
@@ -164,6 +163,8 @@ const IVADetails = (props: {
           isSetup={false}
           refresh={refresh}
           isRefreshing={isFetchingLatestFeed || isLoadingLatestFeed}
+          selectedBucketSet={selectedBucketSet || { id: "", path: "" }}
+          setSelectedBucketSet={setSelectedBucketSet}
         />
       </TabPanel>
       <TabPanel value={value} index={1}>

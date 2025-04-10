@@ -12,6 +12,7 @@ interface UpdateTasksData {
 }
 
 const addTasksToDeviceConfig = async (device: Device, tasks: Omit<Task, 'mappings' | 'isOpen'>[], systemKey: string, url: string, userToken: string) => {
+  console.log('device: ', device)
   const response = await fetch(`${url}/api/v/1/collection/${systemKey}/rtsp_configs`, {
     method: 'PUT',
     headers: {
@@ -70,6 +71,27 @@ const addMappings = async (device: Device, tasks: Task[], systemKey: string, url
   }))
 }
 
+const addBucketToDeployment = async (edge: string, bucketSet: {id: string, path: string}, systemKey: string, url: string, userToken: string) => {
+  const addBucketToDeploymentResponse = await fetch(`${url}/api/v/4/webhook/execute/${systemKey}/rtsp_addBucketToDeployment`, {
+    method: 'POST',
+    headers: {
+      'Clearblade-UserToken': userToken,
+      'clearblade-systemkey': systemKey,
+      'Content-Type': 'application/json',
+    },  
+    body: JSON.stringify({
+      "edge": edge,
+      "bucketSet": bucketSet,
+    }),
+  });
+
+  if (!addBucketToDeploymentResponse.ok) {
+    throw new Error(`Failed to add bucket to deployment: ${addBucketToDeploymentResponse.statusText}`);
+  }
+
+  return Promise.resolve({ message: 'Bucket added to deployment.' });
+}
+
 export const useUpdateTasks = (onSuccess: (data: any) => void, onError: (error: Error) => void) => {
   return useMutation<any, Error, UpdateTasksData>(
     async ({device, tasks, edge}) => {
@@ -89,8 +111,11 @@ export const useUpdateTasks = (onSuccess: (data: any) => void, onError: (error: 
           }
         })
 
-        await addTasksToDeviceConfig(device, updatedTasks, systemKey, url, userToken);
-        await addMappings(device, tasks, systemKey, url, userToken);
+        await Promise.all([
+          addTasksToDeviceConfig(device, updatedTasks, systemKey, url, userToken),
+          addMappings(device, tasks, systemKey, url, userToken),
+          addBucketToDeployment(edge, device.rootPath, systemKey, url, userToken)
+        ])
 
         const updateTasksResponse = await fetch(`${url}/api/v/4/webhook/execute/${systemKey}/manageStreams`, {
           method: 'POST',

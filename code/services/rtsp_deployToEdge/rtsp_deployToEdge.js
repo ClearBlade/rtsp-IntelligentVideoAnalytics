@@ -17,7 +17,7 @@ function rtsp_deployToEdge(req, resp) {
   const edge = params.body.edge;
   const url = cbmeta.platform_url;
   const systemKey = cbmeta.system_key;
-  const deploymentName = 'test';
+  const deploymentName = 'iva';
 
   if (!edge) {
     resp.error("Edge is required for deployment");

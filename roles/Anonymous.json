@@ -14,7 +14,12 @@
         "AllServices": {
             "Level": 0
         },
-        "CodeServices": [],
+        "CodeServices": [
+          {
+              "Level": 1,
+              "Name": "manageStreams"
+          }  
+        ],
         "Collections": [],
         "Deployments": {
             "Level": 0

@@ -37,13 +37,8 @@ function ConfigureBucketSet({
   setSelectedBucketSet,
 }: {
   rootPath: { id: string; path: string } | undefined;
-  selectedBucketSet: { id: string; path: string } | null;
-  setSelectedBucketSet: React.Dispatch<
-    React.SetStateAction<{
-      id: string;
-      path: string;
-    } | null>
-  >;
+  selectedBucketSet: { id: string; path: string };
+  setSelectedBucketSet: (bucketSet: { id: string; path: string }) => void;
 }) {
   const classes = useStyles();
   const { setFieldValue } = useFormikContext<Device>();
@@ -77,10 +72,9 @@ function ConfigureBucketSet({
 
   const handleBucketSetChange = (value: string) => {
     const newRootPath = getBucketSetPath(value);
+    console.log("newRootPath: ", newRootPath);
     setFieldValue("rootPath", newRootPath);
-    if (selectedBucketSet) {
-      setSelectedBucketSet(newRootPath);
-    }
+    setSelectedBucketSet(newRootPath);
   };
 
   if (isError) {
@@ -170,7 +164,9 @@ function ConfigureBucketSet({
             // style={{ width: "40%" }}
             variant="outlined"
             size="small"
-            value={getBucketSetName(rootPath)}
+            value={getBucketSetName(
+              rootPath?.id ? rootPath : selectedBucketSet
+            )}
             onChange={(e) => handleBucketSetChange(e.target.value)}
             disabled={isLoading}
             SelectProps={{

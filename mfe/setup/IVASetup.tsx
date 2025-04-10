@@ -48,6 +48,10 @@ export default function IVASetup(props: IVASetupProps) {
   const [edge, setEdge] = useState<Edge | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [selectedBucketSet, setSelectedBucketSet] = useState<{
+    id: string;
+    path: string;
+  } | null>(device?.rootPath || null);
   // {
   //   username: "",
   //   password: "",
@@ -169,6 +173,8 @@ export default function IVASetup(props: IVASetupProps) {
           isRefreshing={isFetching || isLoading}
           setImage={setImage}
           setDevice={setDevice}
+          selectedBucketSet={selectedBucketSet || { id: "", path: "" }}
+          setSelectedBucketSet={setSelectedBucketSet}
         />
       ),
       Actions: (
@@ -228,7 +234,10 @@ export default function IVASetup(props: IVASetupProps) {
             onClick={() => {
               if (device) {
                 updateTasks({
-                  device,
+                  device: {
+                    ...device,
+                    rootPath: selectedBucketSet || { id: "", path: "" },
+                  },
                   tasks,
                   edge: edge?.name || "",
                 });
@@ -310,10 +319,12 @@ export default function IVASetup(props: IVASetupProps) {
                   if (tabIndex !== 2) {
                     setTabIndex((prev) => prev + 1);
                   } else {
-                    console.log("saving: ", device, tasks, edgeId);
                     if (device) {
                       updateTasks({
-                        device,
+                        device: {
+                          ...device,
+                          rootPath: selectedBucketSet || { id: "", path: "" },
+                        },
                         tasks,
                         edge: edge?.name || "",
                       });

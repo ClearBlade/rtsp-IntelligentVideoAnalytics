@@ -28,6 +28,8 @@ interface EditableDeviceFormProps {
   isRefreshing: boolean;
   setImage: (image: { base64: string; timestamp: number } | null) => void;
   setDevice: (device: Device | null) => void;
+  selectedBucketSet: { id: string; path: string };
+  setSelectedBucketSet: (bucketSet: { id: string; path: string }) => void;
 }
 
 export interface Device {
@@ -290,12 +292,10 @@ function EditableDeviceForm({
   isSetup,
   refresh,
   isRefreshing,
+  selectedBucketSet,
+  setSelectedBucketSet,
 }: EditableDeviceFormProps) {
   const classes = useStyles();
-  const [selectedBucketSet, setSelectedBucketSet] = useState<{
-    id: string;
-    path: string;
-  } | null>(device?.rootPath || null);
   const [activeForm, setActiveForm] = useState<"CREDENTIALS" | "RTSP">(
     "CREDENTIALS"
   );
@@ -402,27 +402,21 @@ function EditableDeviceForm({
           port: "",
           username: "",
           password: "",
+          rootPath: values.rootPath || { id: "", path: "" },
         };
-        setDevice({
-          ...rtspValues,
-          rootPath: selectedBucketSet || { id: "", path: "" },
-        });
+        setDevice(rtspValues);
         initiateStream({ edge: edgeId, device: rtspValues });
       } else {
         const rtspValues = {
           ...values,
           rtspUrl: "",
+          rootPath: values.rootPath || { id: "", path: "" },
         };
-        if (rtspValues) {
-          setDevice({
-            ...rtspValues,
-            rootPath: selectedBucketSet || { id: "", path: "" },
-          });
-          initiateStream({ edge: edgeId, device: rtspValues });
-        }
+        setDevice(rtspValues);
+        initiateStream({ edge: edgeId, device: rtspValues });
       }
     },
-    [activeForm, setDevice, initiateStream, edgeId, selectedBucketSet]
+    [activeForm, setDevice, initiateStream, edgeId]
   );
 
   useEffect(() => {

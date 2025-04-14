@@ -1,7 +1,12 @@
 {
     "indexes": {
-        "Total": 0,
-        "Data": []
+        "Total": 1,
+        "Data": [
+            {
+                "name": "task_uuid",
+                "type": "Unique Index"
+            }
+        ]
     },
     "items": [],
     "name": "rtsp_targets",

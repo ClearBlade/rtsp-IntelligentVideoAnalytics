@@ -137,10 +137,13 @@ main() {
   log "Creating environment file..."
   printenv | grep -E 'CB_*' > env.list
   echo "CB_SYSTEM_SECRET=" >> env.list
+  echo GIT_CONFIG_GLOBAL="safe.directory=/app/tasks" >> env.list
   log "Environment file created"
 
   # Setup cleanup cron job
   setup_cleanup_cron_job
+
+  mkdir tasks
 
   # Start the container
   log "Starting container..."
@@ -149,6 +152,7 @@ main() {
       --network="host" \
       --env-file env.list \
       --name iva-server \
+      -v ./tasks:/app/tasks \
       -p 5001:5001 \
       "$image_name" \
       --platformURL http://localhost:9000 \

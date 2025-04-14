@@ -34,8 +34,8 @@ export const TASK_STORE: TaskStore[] = [
         label: "Object classification",
       },
       {
-        id: "feed",
-        label: "Feed",
+        id: "frame",
+        label: "Frame",
       },
       {
         id: "saved_path",
@@ -59,8 +59,8 @@ export const TASK_STORE: TaskStore[] = [
         label: "Objects detected",
       },
       {
-        id: "feed",
-        label: "Feed",
+        id: "frame",
+        label: "Frame",
       },
       {
         id: "saved_path",

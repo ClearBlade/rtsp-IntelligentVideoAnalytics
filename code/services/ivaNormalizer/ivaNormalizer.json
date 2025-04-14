@@ -11,6 +11,6 @@
         ""
     ],
     "run_on_edge": true,
-    "run_on_platform": true,
+    "run_on_platform": false,
     "run_user": ""
 }

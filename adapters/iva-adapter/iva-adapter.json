@@ -1,0 +1,13 @@
+{
+    "architecture": "linux-amd64",
+    "deploy_command": "./deploy.sh",
+    "description": "",
+    "logs_command": "",
+    "name": "iva-adapter",
+    "os": "",
+    "protocol": "",
+    "start_command": "./start.sh -cb_service_account=iva_admin@clearblade.com",
+    "status_command": "",
+    "stop_command": "./stop.sh",
+    "undeploy_command": "./undeploy.sh"
+}

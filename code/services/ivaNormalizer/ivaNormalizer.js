@@ -154,6 +154,10 @@ function ivaNormalizer(req, resp) {
 
         mappings.forEach(function(mapping) {
           const assetId = mapping.target_asset.id;
+          const attributeId = mapping.target_attribute.id;
+
+          if (!assetId || !attributeId) return;
+
           if (!normalizerPayload[assetId]) {
             normalizerPayload[assetId] = [];
           }
@@ -166,6 +170,7 @@ function ivaNormalizer(req, resp) {
           mappings.forEach(function(mapping) {
             const deviceOutputId = mapping.device_output.id;
             const targetAttributeId = mapping.target_attribute.id;
+            if (!targetAttributeId) return;
             custom_data[targetAttributeId] = task_output[deviceOutputId];
           });
 

@@ -1,0 +1,88 @@
+{
+    "assets": [
+        {
+            "asset_class": "adaptors",
+            "asset_id": "iva-adapter",
+            "deployment": "iva",
+            "member": "iva_deployment_edge_group",
+            "sync_schema_only": false,
+            "sync_to_edge": true,
+            "sync_to_platform": false
+        },
+        {
+            "asset_class": "adapter_config",
+            "asset_id": "",
+            "deployment": "iva",
+            "member": "iva_deployment_edge_group",
+            "sync_schema_only": false,
+            "sync_to_edge": true,
+            "sync_to_platform": false
+        },
+        {
+            "asset_class": "rtsp_configs",
+            "asset_id": "",
+            "deployment": "iva",
+            "member": "iva_deployment_edge_group",
+            "sync_schema_only": false,
+            "sync_to_edge": true,
+            "sync_to_platform": false
+        },
+        {
+            "asset_class": "rtsp_targets",
+            "asset_id": "",
+            "deployment": "iva",
+            "member": "iva_deployment_edge_group",
+            "sync_schema_only": false,
+            "sync_to_edge": true,
+            "sync_to_platform": false
+        },
+        {
+            "asset_class": "libraries",
+            "asset_id": "JSUtils",
+            "deployment": "iva",
+            "member": "iva_deployment_edge_group",
+            "sync_schema_only": false,
+            "sync_to_edge": true,
+            "sync_to_platform": false
+        },
+        {
+            "asset_class": "services",
+            "asset_id": "ivaNormalizer",
+            "deployment": "iva",
+            "member": "iva_deployment_edge_group",
+            "sync_schema_only": false,
+            "sync_to_edge": true,
+            "sync_to_platform": false
+        },
+        {
+            "asset_class": "services",
+            "asset_id": "manageStreams",
+            "deployment": "iva",
+            "member": "iva_deployment_edge_group",
+            "sync_schema_only": false,
+            "sync_to_edge": true,
+            "sync_to_platform": false
+        },
+        {
+            "asset_class": "users",
+            "asset_id": "iva_admin@clearblade.com",
+            "deployment": "iva",
+            "member": "iva_deployment_edge_group",
+            "sync_schema_only": false,
+            "sync_to_edge": true,
+            "sync_to_platform": false
+        },
+        {
+            "asset_class": "webhooks",
+            "asset_id": "manageStreams",
+            "deployment": "iva",
+            "member": "iva_deployment_edge_group",
+            "sync_schema_only": false,
+            "sync_to_edge": true,
+            "sync_to_platform": false
+        }
+    ],
+    "description": "",
+    "edges": [],
+    "name": "iva"
+}

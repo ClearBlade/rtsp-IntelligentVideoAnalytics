@@ -61,27 +61,43 @@ function rtsp_deployToEdge(req, resp) {
   }
 
   function checkAdapterStatus() {
-    sleep(10000);
-    return fetch('https://' + url + '/api/v/4/webhook/execute/' + systemKey + '/manageStreams', {
-      method: 'POST',
-      headers: {
-        'clearblade-edge': edge,
-        'clearblade-systemkey': systemKey, 
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        "action": "check_adapter_status"
-      })
-    }).then(function(response){
-      return response.json();
-    }).then(function(data){
-      if (!data.success) {
-        return Promise.reject(data.results);
-      }
-      return data.results.is_adapter_connected;
-    }).catch(function(error){
-      return Promise.reject(error)
-    });
+    const maxRetries = 10;
+    const delayMs = 5000; // 5 seconds delay
+    var retryCount = 0;
+
+    function attemptFetch() {
+      console.log('trying to connect to adapter. retry attempt: ', retryCount);
+      return fetch('https://' + url + '/api/v/4/webhook/execute/' + systemKey + '/manageStreams', {
+        method: 'POST',
+        headers: {
+          'clearblade-edge': edge,
+          'clearblade-systemkey': systemKey, 
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "action": "check_adapter_status"
+        })
+      }).then(function(response){
+        return response.json();
+      }).then(function(data){
+        if (!data.success) {
+          return Promise.reject(data.results);
+        }
+        return data.results.is_adapter_connected;
+      }).catch(function(error){
+        if (retryCount < maxRetries) {
+          retryCount++;
+          return new Promise(function(resolve){
+            setTimeout(function(){
+              resolve(attemptFetch());
+            }, delayMs);
+          });
+        }
+        return Promise.reject(error);
+      });
+    }
+
+    return attemptFetch();
   }
 
   checkDeploymentStatus()

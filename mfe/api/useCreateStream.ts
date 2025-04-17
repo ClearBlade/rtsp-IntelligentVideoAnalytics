@@ -1,11 +1,12 @@
 import { useMutation } from 'react-query';
 import { Device } from "../components/EditableDeviceForm";
+import { Task } from "../components/Tasks";
 import { getErrorMessage } from '../helpers/getErrorMessage';
 import { getAuthInfo } from '../utils/authInfo';
 import { getPlatformInfo } from '../utils/platformInfo';
 interface StreamData {
   edge: string;
-  device: Device
+  device: Device & { tasks?: Task[] }
 }
 
 interface StreamResponse {
@@ -124,6 +125,17 @@ export const useCreateStream = (onSuccess: (data: StreamResponse) => void) => {
       }
 
       try {
+        const updatedTasks = device?.tasks?.map(task => {
+          const { mappings, isOpen, ...rest } = task;
+          return {
+            ...rest,
+            settings: {
+              ...rest.settings,
+              root_path: device.rootPath
+            }
+          }
+        })
+
         const startStreamResponse = await fetch(`${url}/api/v/4/webhook/execute/${systemKey}/manageStreams`, {
           method: 'POST',
           headers: baseHeaders,
@@ -132,7 +144,7 @@ export const useCreateStream = (onSuccess: (data: StreamResponse) => void) => {
             "body": {
               "camera_id": device.deviceId,
               "camera_url": getRTSPUrl(device),
-              "tasks": []
+              "tasks": updatedTasks || []
             }
           }),
         });

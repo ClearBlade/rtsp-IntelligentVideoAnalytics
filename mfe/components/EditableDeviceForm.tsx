@@ -20,7 +20,7 @@ import { getErrorMessage } from "../helpers/getErrorMessage";
 import { useConfig } from "../context/ConfigContext";
 
 interface EditableDeviceFormProps {
-  device: Device | null;
+  device: (Device & { tasks?: Task[] }) | null;
   image: { base64: string; timestamp: number } | null;
   edgeId: string;
   isSetup: boolean;
@@ -395,7 +395,7 @@ function EditableDeviceForm({
   const handleFormSubmit = useCallback(
     (values: Device) => {
       if (activeForm === "RTSP") {
-        const rtspValues = {
+        const device = {
           ...values,
           ip: "",
           streamingChannel: "",
@@ -404,16 +404,16 @@ function EditableDeviceForm({
           password: "",
           rootPath: values.rootPath || { id: "", path: "" },
         };
-        setDevice(rtspValues);
-        initiateStream({ edge: edgeId, device: rtspValues });
+        setDevice(device);
+        initiateStream({ edge: edgeId, device });
       } else {
-        const rtspValues = {
+        const device = {
           ...values,
           rtspUrl: "",
           rootPath: values.rootPath || { id: "", path: "" },
         };
-        setDevice(rtspValues);
-        initiateStream({ edge: edgeId, device: rtspValues });
+        setDevice(device);
+        initiateStream({ edge: edgeId, device });
       }
     },
     [activeForm, setDevice, initiateStream, edgeId]

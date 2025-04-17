@@ -22,7 +22,18 @@ function ivaNormalizer(req, resp) {
     logger.publishLogWithMQTTLib(client, LogLevels.DEBUG, 'Starting normalizer');
     /** @type {import('../../../backend/Normalizer').MessageParser} */
     const messageParser = function (_topic, messagePayload) {
-      const incomingData = JSON.parse(messagePayload);
+      const view = new DataView(messagePayload.buffer); 
+      const metaDataLength = view.getInt32();
+
+      const metaData = new TextDecoder("utf-8").decode(messagePayload.buffer.slice(4, 4 + metaDataLength))
+      const metaDataObj = JSON.parse(metaData);
+
+      var imageStart = 4 + metaDataLength;
+      var imageBytes = new Uint8Array(messagePayload.buffer.slice(imageStart));
+      const imageBase64 = bufferToBase64(imageBytes.buffer);
+
+      var incomingData = metaDataObj
+      incomingData['frame'] = imageBase64;
 
       if (!(incomingData instanceof Array)) {
         console.log('Is not instance of an array...');
@@ -141,6 +152,10 @@ function ivaNormalizer(req, resp) {
       const task_uuid = data['uuid']
       const task_output = data[task_id + '_output'];
 
+      if (data['frame']) {  
+        task_output['frame'] = 'data:image/jpeg;base64,' + data['frame'];
+      }
+
       const query = ClearBladeAsync.Query().equalTo('device_id', camera_id).equalTo('task_uuid', task_uuid).equalTo('target_id', 'ia')
 
       return targetsCol.fetch(query).then(function(results){
@@ -191,6 +206,40 @@ function ivaNormalizer(req, resp) {
       return Promise.reject(err);
     });
   }
+
+  function btoaPolyfill(binary) {
+    var base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var base64 = "";
+    var padding = "";
+    var i;
+
+    for (i = 0; i < binary.length % 3; ++i) {
+      padding += "=";
+      binary += "\0";
+    }
+
+    for (i = 0; i < binary.length; i += 3) {
+      var n = (binary.charCodeAt(i) << 16) |
+              (binary.charCodeAt(i + 1) << 8) |
+              binary.charCodeAt(i + 2);
+
+      base64 += base64chars[(n >>> 18) & 63] +
+                base64chars[(n >>> 12) & 63] +
+                base64chars[(n >>> 6) & 63] +
+                base64chars[n & 63];
+    }
+
+    return base64.substring(0, base64.length - padding.length) + padding;
+  }
+
+  function bufferToBase64(buffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    for (var i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoaPolyfill(binary);
+  } 
 }
 
 /**
@@ -220,7 +269,7 @@ function normalizer(config, service_instance_id, client, logger) {
    * @param {CbServer.MQTTMessage} message
    */
   function handleMessage(topic, message) {
-    const value = messageParser(topic, message.payload);
+    const value = messageParser(topic, message.payload_bytes);
     if (value instanceof Promise) {
       value
         .then(function (assets) {

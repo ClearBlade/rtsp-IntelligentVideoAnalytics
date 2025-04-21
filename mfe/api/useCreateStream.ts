@@ -6,7 +6,8 @@ import { getAuthInfo } from '../utils/authInfo';
 import { getPlatformInfo } from '../utils/platformInfo';
 interface StreamData {
   edge: string;
-  device: Device & { tasks?: Task[] }
+  device: Device;
+  tasks?: Task[] | null;
 }
 
 interface StreamResponse {
@@ -107,7 +108,7 @@ export const stopStream = async (deviceId: string, url: string, systemKey: strin
 
 export const useCreateStream = (onSuccess: (data: StreamResponse) => void) => {
   return useMutation<StreamResponse, Error, StreamData>(
-    async ({device, edge}) => {
+    async ({device, edge, tasks}) => {
 
       const { systemKey, userToken } = getAuthInfo();
       const { url } = getPlatformInfo();
@@ -125,7 +126,7 @@ export const useCreateStream = (onSuccess: (data: StreamResponse) => void) => {
       }
 
       try {
-        const updatedTasks = device?.tasks?.map(task => {
+        const updatedTasks = tasks?.map(task => {
           const { mappings, isOpen, ...rest } = task;
           return {
             ...rest,

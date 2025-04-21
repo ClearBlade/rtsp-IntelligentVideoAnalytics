@@ -167,6 +167,7 @@ export default function IVASetup(props: IVASetupProps) {
         <EditableDeviceForm
           device={device || null}
           edgeId={edge?.name || ""}
+          tasks={tasks}
           image={image}
           isSetup={true}
           refresh={refresh}

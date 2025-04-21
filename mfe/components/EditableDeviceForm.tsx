@@ -20,7 +20,8 @@ import { getErrorMessage } from "../helpers/getErrorMessage";
 import { useConfig } from "../context/ConfigContext";
 
 interface EditableDeviceFormProps {
-  device: (Device & { tasks?: Task[] }) | null;
+  device: Device | null;
+  tasks: Task[] | null;
   image: { base64: string; timestamp: number } | null;
   edgeId: string;
   isSetup: boolean;
@@ -287,6 +288,7 @@ function EditableDeviceForm({
   image,
   edgeId,
   device,
+  tasks,
   setImage,
   setDevice,
   isSetup,
@@ -405,7 +407,7 @@ function EditableDeviceForm({
           rootPath: values.rootPath || { id: "", path: "" },
         };
         setDevice(device);
-        initiateStream({ edge: edgeId, device });
+        initiateStream({ edge: edgeId, device, tasks });
       } else {
         const device = {
           ...values,
@@ -413,7 +415,7 @@ function EditableDeviceForm({
           rootPath: values.rootPath || { id: "", path: "" },
         };
         setDevice(device);
-        initiateStream({ edge: edgeId, device });
+        initiateStream({ edge: edgeId, device, tasks });
       }
     },
     [activeForm, setDevice, initiateStream, edgeId]

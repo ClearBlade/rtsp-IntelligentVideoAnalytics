@@ -156,6 +156,7 @@ const IVADetails = (props: {
       <TabPanel value={value} index={0}>
         <EditableDeviceForm
           device={device}
+          tasks={tasks}
           edgeId={deviceDetails?.edge || ""}
           image={image}
           setDevice={setDevice}

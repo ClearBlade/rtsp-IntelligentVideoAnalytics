@@ -23,7 +23,7 @@ function rtsp_addBucketToDeployment(req, resp) {
   const bucketSet = params.body.bucketSet; // {id: "", path: ""};
   const url = cbmeta.platform_url;
   const systemKey = cbmeta.system_key;
-  const deploymentName = 'bsSync';
+  const deploymentName = 'iva';
   
   if (!bucketSet || bucketSet.id === "") {
     resp.success("no bucket set found to deploy");

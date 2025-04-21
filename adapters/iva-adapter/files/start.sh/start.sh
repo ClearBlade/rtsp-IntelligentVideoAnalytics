@@ -1,6 +1,6 @@
 #!/bin/bash
 
-image_name="drewhardie/iva-server:1.0.1"
+image_name="drewhardie/iva-server:latest"
 cleanup_script="/usr/local/bin/cleanup_clearblade_buckets.sh"
 cron_job_file="/etc/cron.d/clearblade-cleanup"
 
@@ -153,7 +153,7 @@ main() {
       --env-file env.list \
       --name iva-server \
       -v ./tasks:/app/tasks \
-      -p 5001:5001 \
+      -v /tmp/clearblade_platform_buckets:/tmp/clearblade_platform_buckets:rw \
       "$image_name" \
       --platformURL http://localhost:9000 \
       --messagingURL localhost:1883

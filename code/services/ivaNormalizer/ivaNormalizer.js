@@ -15,11 +15,10 @@ function ivaNormalizer(req, resp) {
   /** @type {import('@ia/common/misc/normalizer').NormalizerPublishConfig} */
   const publishConfig = createPublishConfig();
 
-  const logger = new Logger({ name: 'normalizerDefaultMQTT', logSetting: LogLevels.INFO });
   const targetsCol = ClearBladeAsync.Collection('rtsp_targets');
 
   try {
-    logger.publishLogWithMQTTLib(client, LogLevels.DEBUG, 'Starting normalizer');
+    console.debug('Starting normalizer');
     /** @type {import('../../../backend/Normalizer').MessageParser} */
     const messageParser = function (_topic, messagePayload) {
       const view = new DataView(messagePayload.buffer); 
@@ -59,8 +58,7 @@ function ivaNormalizer(req, resp) {
         normalizerPubConfig: publishConfig,
       },
       req.service_instance_id,
-      client,
-      logger
+      client
     );
   } catch (err) {
     console.error('Error starting normalizer', getErrorMessage(err));
@@ -122,7 +120,7 @@ function ivaNormalizer(req, resp) {
        */
       function (result, rec) {
         if (!rec.id) {
-          logger.publishLogWithMQTTLib(client, LogLevels.ERROR, 'Incoming Message is missing ID: ', rec);
+          console.error('Incoming Message is missing ID: ', rec);
           return result;
         }
         // Include last_location_updated if location has actually changed
@@ -247,14 +245,13 @@ function ivaNormalizer(req, resp) {
  * @param {import('../../../backend/Normalizer').NormalizerConfig} config
  * @param {string} service_instance_id
  * @param {CbServer.MQTTClient} client
- * @param {LoggerInterface} logger
  */
-function normalizer(config, service_instance_id, client, logger) {
+function normalizer(config, service_instance_id, client) {
   const topics = config.topics;
   const normalizerPubConfig = config.normalizerPubConfig;
   const messageParser = config.messageParser;
 
-  logger.publishLogWithMQTTLib(client, LogLevels.DEBUG, 'Normalizer SERVICE_INSTANCE_ID: ' + service_instance_id);
+  console.debug('Normalizer SERVICE_INSTANCE_ID: ' + service_instance_id);
 
   topics.forEach(function (topic) {
     client.subscribe(topic, handleMessage).catch(function (err) {
@@ -276,7 +273,7 @@ function normalizer(config, service_instance_id, client, logger) {
           return bulkPublisher(assets, normalizerPubConfig, client);
         })
         .catch(function (err) {
-          logger.publishLogWithMQTTLib(client, LogLevels.ERROR, 'An error has occurred: ' + getErrorMessage(err));
+          console.error('An error has occurred: ' + getErrorMessage(err));
         });
     } else {
       if (value) {
@@ -284,4 +281,99 @@ function normalizer(config, service_instance_id, client, logger) {
       }
     }
   }
+
+  /**
+   * @param {unknown} error
+   * @returns {error is ErrorWithMessage}
+   */
+  function isErrorWithMessage(error) {
+    return typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string';
+  }
+  
+  /**
+   *
+   * @param {unknown} maybeError
+   * @returns {ErrorWithMessage}
+   */
+  function toErrorWithMessage(maybeError) {
+    if (isErrorWithMessage(maybeError)) return maybeError;
+  
+    try {
+      return new Error(JSON.stringify(maybeError));
+    } catch (e) {
+      // fallback in case there's an error stringifying the maybeError
+      // like with circular references for example.
+      return new Error(String(maybeError));
+    }
+  }
+
+  function getErrorMessage(error) {
+    return toErrorWithMessage(error).message;
+  }
+
+  function bulkPublisher(assets, normalizerPubConfig, client) {
+    Object.keys(normalizerPubConfig).forEach(function (key) {
+      const pubConfigClient = normalizerPubConfig[key].client;
+      const mqttClient = pubConfigClient ? pubConfigClient : client;
+      publisher(assets, normalizerPubConfig[key], mqttClient);
+    });
+  }
+  
+  /**
+   *
+   * @param {Array<Partial<import('@ia/common/collection-types/asset').Asset['frontend_create']>>} assets
+   * @param {import('@ia/common/misc/normalizer').PublishConfig} pubConfig
+   * @param {CbServer.MQTTClient} client
+   */
+  function publisher(assets, pubConfig, client) {
+    if (pubConfig.batchPublish) {
+      // In case assets contains multiple asset id's.
+      const topicBatches = assets.reduce(
+        /**
+         *
+         * @param {{ [topic: string]: Record<string, unknown>[] }} acc
+         * @param {Partial<import('@ia/common/collection-types/asset').Asset['frontend_create']>} asset
+         * @returns
+         */
+        function (acc, asset) {
+          if (typeof pubConfig.shouldPublishAsset === 'undefined' || pubConfig.shouldPublishAsset(asset)) {
+            const topic = pubConfig.topicFn(/** @type {string} */ (asset.id));
+            const pubData = pubConfig.keysToPublish.reduce(function (acc, key) {
+              acc[key] =
+                asset[
+                  /** @type {keyof Partial<import('@ia/common/collection-types/asset').Asset['frontend_create']>} */ (key)
+                ];
+              return acc;
+            }, /** @type {Record<string, unknown>} */ ({}));
+  
+            if (acc[topic]) {
+              acc[topic].push(pubData);
+            } else {
+              acc[topic] = [pubData];
+            }
+          }
+          return acc;
+        },
+        {}
+      );
+      Object.keys(topicBatches).forEach(function (topic) {
+        void client.publish(topic, JSON.stringify(topicBatches[topic]));
+      });
+    } else {
+      assets.forEach(function (asset) {
+        const topic = pubConfig.topicFn(/** @type {string} */ (asset.id));
+        /** @type {Record<string, unknown>} */
+        const pubData = {};
+        if (typeof pubConfig.shouldPublishAsset === 'undefined' || pubConfig.shouldPublishAsset(asset)) {
+          pubConfig.keysToPublish.forEach(function (key) {
+            pubData[key] =
+              asset[
+                /** @type {keyof Partial<import('@ia/common/collection-types/asset').Asset['frontend_create']>} */ (key)
+              ];
+          });
+          void client.publish(topic, JSON.stringify(pubData));
+        }
+      });
+    }
+  }  
 }

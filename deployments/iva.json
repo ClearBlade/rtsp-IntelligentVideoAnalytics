@@ -10,15 +10,6 @@
             "sync_to_platform": false
         },
         {
-            "asset_class": "adapter_config",
-            "asset_id": "",
-            "deployment": "iva",
-            "member": "iva_deployment_edge_group",
-            "sync_schema_only": false,
-            "sync_to_edge": true,
-            "sync_to_platform": false
-        },
-        {
             "asset_class": "rtsp_configs",
             "asset_id": "",
             "deployment": "iva",
@@ -30,15 +21,6 @@
         {
             "asset_class": "rtsp_targets",
             "asset_id": "",
-            "deployment": "iva",
-            "member": "iva_deployment_edge_group",
-            "sync_schema_only": false,
-            "sync_to_edge": true,
-            "sync_to_platform": false
-        },
-        {
-            "asset_class": "libraries",
-            "asset_id": "JSUtils",
             "deployment": "iva",
             "member": "iva_deployment_edge_group",
             "sync_schema_only": false,
